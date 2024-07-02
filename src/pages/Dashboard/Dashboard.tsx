@@ -11,6 +11,7 @@ import { DatePickerWithRange } from "@/components/ui/date-range-picker";
 import { Overview } from "@/components/Overview";
 import { RecentSales } from "@/modules/analytics/components/RecentSales";
 import { useTitle } from "@/hooks/useTitle";
+import Notifications from "./modules/Notifications/Notifications";
 
 export default function DashboardPage() {
   useTitle("Panel de control");
@@ -35,7 +36,7 @@ export default function DashboardPage() {
             <TabsTrigger value="reports" disabled>
               Informes
             </TabsTrigger>
-            <TabsTrigger value="notifications" disabled>
+            <TabsTrigger value="notifications">
               Notificaciones
             </TabsTrigger>
           </TabsList>
@@ -137,6 +138,10 @@ export default function DashboardPage() {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+          {/* ************************* SECTION NOTIFICATIONS **************************/}
+          <TabsContent value="notifications">
+            <Notifications/>              
           </TabsContent>
         </Tabs>
       </div>

@@ -8,7 +8,6 @@ import { Profile } from "@/modules/profile/pages/Profile";
 import { Sales } from "@/modules/sale/pages/Sales";
 import { Users } from "@/modules/user/pages/Users";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import DashboardPage from "@/pages/Dashboard";
 import SettingsAppearancePage from "@/modules/configuration/pages/Appearance";
 import { Promociones } from "@/modules/configuration/pages/Promotion";
 import PDFPreview from "@/modules/sale/components/PDFPreview";
@@ -20,6 +19,7 @@ import { Purchases } from "@/modules/expenses/pages/Purchases";
 import { History } from "@/modules/expenses/pages/History";
 import { Payments } from "@/modules/expenses/pages/Payments";
 import Expenses from "@/modules/expenses/pages/Expenses";
+import DashboardPage from "@/pages/Dashboard/Dashboard";
 
 const appRouter = [
   {
