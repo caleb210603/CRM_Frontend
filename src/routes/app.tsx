@@ -20,8 +20,8 @@ import { Purchases } from "@/modules/expenses/pages/Purchases";
 import { History } from "@/modules/expenses/pages/History";
 import { Payments } from "@/modules/expenses/pages/Payments";
 import Expenses from "@/modules/expenses/pages/Expenses";
-import { Providers } from "@/modules/expenses/pages/Providers";
 import { Items } from "@/modules/items/pages/Items";
+import { Providers } from "@/modules/provider/pages/Providers";
 
 const appRouter = [
   {
