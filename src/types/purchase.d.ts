@@ -1,16 +1,17 @@
 export interface Purchase {
-    id?: number;
-    provider_id: number;
-    date_purchase: Date;
-    number_bill: string;
-    total: number;
-    status: string;
-    created_at?: Date;
-    updated_at?: Date;
-    details?: PurchaseDetail[];
-    provider?: Provider;
-    payment?: Payment;
-};
+  id?: number;
+  description: string;
+  provider_id: number;
+  date_purchase: Date;
+  number_bill: string;
+  total: number;
+  status: string;
+  created_at?: Date;
+  updated_at?: Date;
+  details?: PurchaseDetail[];
+  provider?: Provider;
+  payment?: Payment;
+}
 
 export interface PurchaseDetail {
     id : number;
@@ -40,7 +41,6 @@ export interface Provider {
 
 export interface Payment {
     id: number;
-    purchase_id: number;
     date_payment: Date;
     date_limit: string;
     payment_method: string;

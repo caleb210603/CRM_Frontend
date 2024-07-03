@@ -15,9 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { fuzzyFilter } from "@/lib/utils";
-import { columns } from "@/modules/client/components/management/Columns";
-import { ClientDetail } from "@/types/auth";
+import { Provider as BaseProvider } from "@/types/purchase";
 import {
   ColumnFiltersState,
   SortingState,
@@ -29,67 +27,54 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-
-import { ChevronDown } from "lucide-react";
-import { useState } from "react";
 import Papa from "papaparse";
-import { Dir } from "fs";
-import { DocumentType, getDocumentType } from "@/enums/documentType";
-import { Gender, getGender } from "@/enums/gender";
+import { useState } from "react";
+import { columns } from "@/modules/provider/components/management/Columns";
+import { fuzzyFilter } from "@/lib/utils";
+import { ChevronDown } from "lucide-react";
 
-interface Props {
-  data: ClientDetail[];
-  isLoading: boolean;
-  setPage: () => void;
-  count: number;
-  onSearchChange: (newSearchQuery: string) => void;
+interface ExtendedProvider extends BaseProvider {
+  role_auth: number;
 }
 
-export function ClientDataTable({
-  data,
-  isLoading,
-  setPage,
-  count,
-  onSearchChange,
-}: Props) {
-  console.log("datos: ", data)
+interface Props {
+  data: ExtendedProvider[];
+  isLoading: boolean;
+}
+
+const columnLabels: { [key: string]: string } = {
+  name: "Razon Social",
+  ruc: "N° de R.U.C.",
+  person_contact: "Nombre de contacto",
+  phone: "N° de contacto",
+  email: "Correo",
+  address: "Dirección",
+};
+
+export const ProviderDataTable = ({ data, isLoading }: Props) => {
+  
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
   const [globalFilter, setGlobalFilter] = useState("");
 
-  const itemsPerPage = 5;
-
-  const clientColumnLabels: { [key: string]: string } = {
-    lastname: "Apellidos",
-    name: "Nombre",
-    address: "Dirección",
-    cellNumber: "Celular",
-    active: "estado",
-    image: "image",
-  };
-
-  const clientTable = useReactTable({
+  const providerTable = useReactTable({
     data,
     columns,
-    autoResetPageIndex: false,
-    pageCount: Math.ceil(count / itemsPerPage),
     filterFns: {
       fuzzy: fuzzyFilter,
     },
     onSortingChange: setSorting,
-
     onColumnFiltersChange: setColumnFilters,
-    getSortedRowModel: getSortedRowModel(),
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
     onGlobalFilterChange: setGlobalFilter,
     globalFilterFn: fuzzyFilter,
-
     state: {
       sorting,
       columnFilters,
@@ -99,46 +84,36 @@ export function ClientDataTable({
     },
     initialState: {
       pagination: {
-        pageIndex: 0,
-        pageSize: itemsPerPage,
+        pageSize: 5,
       },
     },
   });
-  
-  /*Conversión a Excel*/
+
   const exportToCSV = () => {
     try {
-      const renamedData = data.map(item => {
-        const documentType = getDocumentType(item.document_type);
-        const gender = getGender(item.gender);
-
+      const renamedData = data.map((item) => {
         return {
           id: item.id,
           Nombre: item.name,
-          Apellido: item.lastname,
-          Documento: documentType,
-          Número: item.document_number,
-          FechaDeNacimiento: item.birthdate,
+          Ruc: item.ruc,
+          Contacto: item.person_contact,
+          Telefono: item.phone,
           Correo: item.email,
-          Género: gender,
-          Teléfono: item.phone,
           Dirección: item.address,
-          CodigoPostal: item.postal_code,
-          Provincia: item.province,
-          Distrito: item.district,
-          País: item.country,
         };
       });
 
       const csvData = Papa.unparse(renamedData, {
-        delimiter: ";"
+        delimiter: ";",
       });
-      const BOM = "\uFEFF"; 
-      const csvBlob = new Blob([BOM + csvData], { type: 'text/csv;charset=utf-8;' }); 
+      const BOM = "\uFEFF";
+      const csvBlob = new Blob([BOM + csvData], {
+        type: "text/csv;charset=utf-8;",
+      });
       const url = URL.createObjectURL(csvBlob);
-      const link = document.createElement('a');
-      link.setAttribute('href', url);
-      link.setAttribute('download', 'clients.csv');
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", "clients.csv");
       link.click();
     } catch (error) {
       console.error("Error exporting CSV: ", error);
@@ -151,7 +126,7 @@ export function ClientDataTable({
         <DebouncedInput
           placeholder="Filtrar por palabra clave"
           value={globalFilter}
-          onChange={(value) => onSearchChange(String(value))}
+          onChange={(value) => setGlobalFilter(String(value))}
           className="max-w-sm"
         />
         <DropdownMenu>
@@ -160,9 +135,14 @@ export function ClientDataTable({
               Columnas <ChevronDown className="ml-2 h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <Button onClick={exportToCSV} className="bg-green-500 hover:bg-green-600 ml-2">Exportar CSV</Button>
+          <Button
+            onClick={exportToCSV}
+            className="bg-green-500 hover:bg-green-600 ml-2"
+          >
+            Exportar CSV
+          </Button>
           <DropdownMenuContent align="end">
-            {clientTable
+            {providerTable
               .getAllColumns()
               .filter((column) => column.getCanHide())
               .map((column) => {
@@ -175,7 +155,7 @@ export function ClientDataTable({
                       column.toggleVisibility(!!value)
                     }
                   >
-                    {clientColumnLabels[column.id] || column.id}
+                    {columnLabels[column.id] || column.id}
                   </DropdownMenuCheckboxItem>
                 );
               })}
@@ -188,7 +168,7 @@ export function ClientDataTable({
         ) : (
           <Table>
             <TableHeader>
-              {clientTable.getHeaderGroups().map((headerGroup) => (
+              {providerTable.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => {
                     return (
@@ -206,8 +186,8 @@ export function ClientDataTable({
               ))}
             </TableHeader>
             <TableBody>
-              {clientTable.getRowModel().rows?.length ? (
-                clientTable.getRowModel().rows.map((row) => (
+              {providerTable.getRowModel().rows?.length ? (
+                providerTable.getRowModel().rows.map((row) => (
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
@@ -238,33 +218,23 @@ export function ClientDataTable({
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
-          {clientTable.getFilteredSelectedRowModel().rows.length} de{" "}
-          {clientTable.getFilteredRowModel().rows.length} fila(s)
-          seleccionada(s)
+          {providerTable.getFilteredSelectedRowModel().rows.length} de{" "}
+          {providerTable.getFilteredRowModel().rows.length} fila(s) seleccionada(s)
         </div>
         <div className="space-x-2">
           <Button
             variant="outline"
             size="sm"
-            onClick={() => {
-              clientTable.previousPage();
-            }}
-            disabled={!clientTable.getCanPreviousPage()}
+            onClick={() => providerTable.previousPage()}
+            disabled={!providerTable.getCanPreviousPage()}
           >
             Anterior
           </Button>
-
           <Button
             variant="outline"
             size="sm"
-            onClick={() => {
-              setPage();
-
-              setTimeout(() => {
-                clientTable.nextPage();
-              }, 100);
-            }}
-            disabled={!clientTable.getCanNextPage()}
+            onClick={() => providerTable.nextPage()}
+            disabled={!providerTable.getCanNextPage()}
           >
             Siguiente
           </Button>
@@ -272,4 +242,4 @@ export function ClientDataTable({
       </div>
     </div>
   );
-}
+};

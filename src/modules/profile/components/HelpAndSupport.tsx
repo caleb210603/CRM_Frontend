@@ -1,22 +1,20 @@
 import { Command, CommandGroup, CommandItem } from "@/components/ui/command";
 import { CommandList } from "cmdk";
-import { ChevronRight, KeyRound, PencilLine } from "lucide-react";
+import { ChevronRight, HandHelping,  Mail} from "lucide-react";
 import { useState } from "react";
-import ConfigurePassword from "./ConfigurePassword";
-import { ConfigureName } from "./ConfigureName";
+import { ContactForm } from "./support/ContactForm";
+import { HelpContent } from "./support/HelpContent";
 
-
-
-export const ConfigurationList = () => {
+export const HelpAndSupport = () => {
   const [statusButton, setstatusButton] = useState("CL");
 
   const icons = (id: number) => {
     if (id === 1) {
-      return <KeyRound size={"20px"} />;
+      return <HandHelping size={"20px"} />;
     }
 
     if (id === 2) {
-      return <PencilLine size={"20px"} />;
+      return <Mail size={"20px"} />;
     }
   };
 
@@ -24,16 +22,16 @@ export const ConfigurationList = () => {
     {
       id: 1,
       status: "CC",
-      icon: "KeyRound",
-      name: "Cambiar contraseña",
-      description: "Puedes cambiar tu contraseña en cualquier momento",
+      icon: "hand-helping",
+      name: "Preguntas frecuentes",
+      description: "Encuentra respuestas a las preguntas más comunes",
     },
     {
       id: 2,
       status: "CN",
-      icon: "UserRound",
-      name: "Cambiar tu nombre",
-      description: "Puedes cambiar tu nombre de usuario cada un mes",
+      icon: "mail",
+      name: "Contáctanos",
+      description: "Ponte en contacto con nuestro equipo de soporte",
     },
   ];
   return (
@@ -41,7 +39,7 @@ export const ConfigurationList = () => {
       {statusButton === "CL" && (
         <Command>
           <p className="font-bold mb-5 text-xl flex justify-center md:flex-none md:justify-start">
-            Privacidad y seguridad
+            Ayuda y Soporte
           </p>
           <CommandList>
             <CommandGroup className="border p-0 rounded-md max-w-md">
@@ -69,12 +67,8 @@ export const ConfigurationList = () => {
           </CommandList>
         </Command>
       )}
-      {statusButton === "CC" && (
-        <ConfigurePassword setstatusButton={setstatusButton}/>
-      )}
-      {statusButton === "CN" && (
-        <ConfigureName setstatusButton={setstatusButton} />
-      )}
+      {statusButton === "CC" && <HelpContent setstatusButton={setstatusButton}/>}
+      {statusButton === "CN" && <ContactForm setstatusButton={setstatusButton} />}
     </div>
   );
 };

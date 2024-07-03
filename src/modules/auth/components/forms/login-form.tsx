@@ -1,7 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -14,7 +13,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { LoginSchema } from "@/lib/validators/auth";
 import { Checkbox } from "@/components/ui/checkbox";
-import api from "@/services/api";
 import { useDispatch } from "react-redux";
 import { login } from "@/store/auth";
 import { Link, useNavigate } from "react-router-dom";
@@ -56,7 +54,7 @@ export function LoginForm() {
     } catch (error: any) {
       if (error.response && error.response.status === 401) {
         toast({
-          title: "Credenciales incorrectas",
+          title: "Contraseña o usuario incorrectos",
           variant: "destructive",
         });
       } else {

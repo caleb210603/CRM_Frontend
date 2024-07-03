@@ -6,8 +6,10 @@ import { useNavigate } from 'react-router-dom';
 import { Purchases } from './Purchases';
 import { History } from './History';
 import { Payments } from './Payments';
+import { useTitle } from '@/hooks/useTitle';
 
 export default function Expenses() {
+  useTitle('Gastos')
   const [selectedTab, setSelectedTab] = useState<string | null>(null);
   const navigate = useNavigate();
 
