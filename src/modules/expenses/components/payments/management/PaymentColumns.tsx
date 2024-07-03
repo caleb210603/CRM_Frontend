@@ -1,6 +1,9 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Payment } from "@/types/purchase";
-import { FaSort, FaSortUp, FaSortDown } from 'react-icons/fa';
+import { FaSort, FaSortUp, FaSortDown} from 'react-icons/fa';
+import CancelledTotal from "../CancelledTotal";
+import DeletePayments from "../DeletePayment";
+
 
 const createColumn = (accessorKey: keyof Payment, label: string, sortable: boolean = false): ColumnDef<Payment> => {
   return {
@@ -26,10 +29,10 @@ const createColumn = (accessorKey: keyof Payment, label: string, sortable: boole
     ),
     cell: ({ cell }) => (
       <div className={`flex items-center justify-center ${
-        accessorKey === 'status' 
+        accessorKey === 'estatus' 
         ? cell.getValue() === 'Completado' 
           ? 'bg-green-500 text-white rounded-lg h-6 '
-          : cell.getValue() === 'Fallado'
+          : cell.getValue() === 'Vencido'
           ? 'bg-red-500 text-white rounded-lg h-6'
           : 'bg-yellow-500 text-white rounded-lg h-6'
         : ''}`}>
@@ -41,13 +44,40 @@ const createColumn = (accessorKey: keyof Payment, label: string, sortable: boole
   };
 };
 
+const createActionsColumn = (): ColumnDef<Payment> => {
+  return {
+    accessorKey: "actions",
+    header: () => (
+      <div className="flex items-center justify-center text-white hover:text-white hover:text-black font-semibold">
+        <span>Acciones</span>
+      </div>
+    ),
+    cell: ({ row }) => {
+
+      return (
+      <div className="flex items-center justify-center"> 
+       {/*Funcion para abonar al total cancelado*/ }    
+       <CancelledTotal
+        paymentdata={row.original}
+       />  
+      {/*Funcion para Eliminar pago seleccionado*/ }    
+       <DeletePayments
+       id={row.original.id}
+       />
+      </div>
+    )
+  }
+};
+}
+
 export const columns: ColumnDef<Payment>[] = [
   createColumn("id", "ID",true),
-  createColumn("purchase_id", "Código de Compra"),
+  createColumn( "description_obj", "Descripción"),
   createColumn("date_payment", "Fecha", true),
   createColumn("date_limit", "Fecha Límite"),
   createColumn("payment_method", "Método de Pago"),
   createColumn("total", "Total", true), // Hacemos esta columna sortable
   createColumn("cancelled_total", "Total Cancelado"),
-  createColumn("status", "Estado"),
+  createColumn("estatus", "Estado"),
+  createActionsColumn(), // Añadimos la columna de acciones al final
 ];

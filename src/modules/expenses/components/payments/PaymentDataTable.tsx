@@ -36,8 +36,9 @@ import { Input } from "@/components/ui/input";
     /*Funcion para filtro de estado*/
     const [statusFilter, setStatusFilter] = useState('');
 
+
   const filteredData = statusFilter
-    ? data.filter(payment => payment.status === statusFilter)
+    ? data.filter(payment => payment.estatus === statusFilter)
     : data;
   /*----------------------------------------------------*/ 
 
@@ -78,7 +79,7 @@ import { Input } from "@/components/ui/input";
               <option value="">Todos</option>
               <option value="Completado">Completado</option>
               <option value="Pendiente">Pendiente</option>
-              <option value="Fallado">Fallado</option>
+              <option value="Vencido">Vencido</option>
             </select>
             {/*-----------------------------------------------------*/}
             <div className="p-4">

@@ -23,6 +23,7 @@ import Expenses from "@/modules/expenses/pages/Expenses";
 import { Items } from "@/modules/items/pages/Items";
 import { Providers } from "@/modules/provider/pages/Providers";
 
+
 const appRouter = [
   {
     path: "/PDFSaleDetail/:saleID",

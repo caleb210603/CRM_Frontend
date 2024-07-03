@@ -1,4 +1,3 @@
-import { ClientSchema } from "@/lib/validators/client";
 import {
   Form,
   FormControl,
@@ -9,7 +8,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { z } from "zod";
 import { ClientDetail as client } from "@/types/auth";
 import {
   Select,
@@ -18,13 +16,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { toast } from "@/hooks/useToast";
-import api from "@/services/api";
+
 import { useQueryClient } from "react-query";
-import { useEditClient } from "../hooks/useEditCient";
+
 import { updateClient } from "../services/clientService";
-import { DocumentType, getDocumentType } from "@/enums/documentType";
-import { Gender, getGender } from "@/enums/gender";
+import { getDocumentType } from "@/enums/documentType";
+import { getGender } from "@/enums/gender";
 
 interface Props {
   edit: boolean;
@@ -37,38 +34,9 @@ interface Props {
 
 function CLientDataEditable({ edit, client, setIsPending, form, file, setFile }: Props) {
   const queryClient = useQueryClient();
-  const type = client?.document_type;
   const getDocumentTypeValue = getDocumentType(client?.document_type);
   const getGenderValue = getGender(client?.gender);
 
-  const { editClient } = useEditClient();
-  /*const {  mutate, isLoading } = editClient(client?.id, {
-    name: form.getValues("name"),
-    lastname: form.getValues("lastname"),
-    document_type: form.getValues("document_type"),
-    document_number: form.getValues("document_number"),
-    birthdate: form.getValues("birthdate"),
-    email: form.getValues("email"),
-    gender: form.getValues("gender"),
-    phone: form.getValues("cellNumber"),
-    address: form.getValues("address"),
-    postal_code: form.getValues("postal_code"),
-    province: form.getValues("province"),
-    district: form.getValues("district"),
-    country: form.getValues("country"),
-    active: form.getValues("active"),
-    image: form.getValues("active"),
-  });
-
-  const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setIsPending(true);
-    try {
-      await mutate();
-    } finally {
-      setIsPending(false);
-    }
-  };*/
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();

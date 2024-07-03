@@ -18,19 +18,28 @@ export const useFetchSales = (url = "/sales") => {
         const fetchData = async () => { 
           try {
             const { data } = await api.get(url);
-            const NextPageresponseSale = await api.get(data.next);
             const productDetailsResponse = await api.get("/saledetailproduct");
             const serviceDetailsResponse = await api.get("/saledetailservice");
-            setSalesData({
-              sales: [...data.results, ...NextPageresponseSale.data.results],
-              productData: productDetailsResponse.data.results,
-              serviceData: serviceDetailsResponse.data.results
-            });
-
-            if(data.next){
-              useFetchSales(NextPageresponseSale.data.next);
+            /*Loop para reutilizar la const y mostrar todas las ventas disponibles*/
+            if (data.next) {
+              const NextPageresponseSale = await api.get(data.next);
+              setSalesData({
+                sales: [...data.results, ...NextPageresponseSale.data.results],
+                productData: productDetailsResponse.data.results,
+                serviceData: serviceDetailsResponse.data.results
+              });
+                if(data.next){
+                useFetchSales(NextPageresponseSale.data.next);
+                }
+            /*--------------------------------------------------------------------*/    
+            } else {
+              setSalesData({
+                sales: [...data.results],
+                productData: productDetailsResponse.data.results,
+                serviceData: serviceDetailsResponse.data.results
+              });
             }
-            
+                   
           } catch (error) {
             console.error("Error fetching data:", error);
           }
