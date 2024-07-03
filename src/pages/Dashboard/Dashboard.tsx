@@ -12,9 +12,26 @@ import { Overview } from "@/components/Overview";
 import { RecentSales } from "@/modules/analytics/components/RecentSales";
 import { useTitle } from "@/hooks/useTitle";
 import Notifications from "./modules/Notifications/Notifications";
+import { useQuery } from "react-query";
+import { User } from "@/types/auth";
+import api from "@/services/api";
+
+// Función para obtener el perfil del usuario autenticado (usando la misma interfaz User)
+const getUser = async (): Promise<User> => {
+  const { data } = await api.get<User>("/auth/profile");
+  return data;
+};
+
 
 export default function DashboardPage() {
   useTitle("Panel de control");
+  
+  const {data: userAuth} = useQuery<User>('user', getUser);
+
+  const isAdmin = ()=> {
+    return userAuth?.role === 1;  
+  }
+
   return (
     <div className="flex flex-col">
       <div className="flex-1 space-y-4">
@@ -36,9 +53,12 @@ export default function DashboardPage() {
             <TabsTrigger value="reports" disabled>
               Informes
             </TabsTrigger>
-            <TabsTrigger value="notifications">
-              Notificaciones
-            </TabsTrigger>
+            { 
+              isAdmin() && 
+                <TabsTrigger value="notifications">
+                  Notificaciones
+                </TabsTrigger>
+            }
           </TabsList>
           <TabsContent value="overview" className="space-y-4 items-center">
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 w-full">
@@ -138,8 +158,7 @@ export default function DashboardPage() {
                 </CardContent>
               </Card>
             </div>
-          </TabsContent>
-          {/* ************************* SECTION NOTIFICATIONS **************************/}
+          </TabsContent>          
           <TabsContent value="notifications">
             <Notifications/>              
           </TabsContent>

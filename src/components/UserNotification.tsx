@@ -7,13 +7,7 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { UserNotificationTab } from "./UserNotificationTab";
-
-export interface Notification {
-  id: number;
-  title: string;
-  notification: string;
-  date: Date;
-}
+import { Notification } from "@/types/notification";
 
 const list: Notification[] = [
   {
@@ -59,9 +53,8 @@ const list: Notification[] = [
   },
 ];
 
-export default function UserNotification() {
-  const [listNotification, setListNotification] =
-    useState<Notification[]>(list);
+export default function UserNotification() {  
+  const [listNotifications, setListNotifications] = useState(list);
   const [archives, setArchives] = useState<Notification[]>([]);
   const [notificationOpen, setNotificationOpen] = useState<boolean>(false);
 
@@ -70,12 +63,12 @@ export default function UserNotification() {
   };
 
   const handleArchive = (id: number) => {
-    const index = listNotification.findIndex((item) => item.id === id);
+    const index = listNotifications.findIndex((item) => item.id === id);
 
     if (index !== -1) {
-      const newElements = [...listNotification];
+      const newElements = [...listNotifications];
       const elementArchived = newElements.splice(index, 1)[0];
-      setListNotification(newElements);
+      setListNotifications(newElements);
       setArchives([elementArchived, ...archives]);
     }
   };
@@ -87,7 +80,7 @@ export default function UserNotification() {
       const newArchives = [...archives];
       const elementRestored = newArchives.splice(index, 1)[0];
       setArchives(newArchives);
-      setListNotification([...listNotification, elementRestored]);
+      setListNotifications([...listNotifications, elementRestored]);
     }
   };
 
@@ -107,7 +100,7 @@ export default function UserNotification() {
           className="relative p-[.4rem] rounded-full bg-primary cursor-pointer"
           onClick={handleNotification}
         >
-          {listNotification.length > 0 && (
+          {listNotifications.length > 0 && (
             <span className="absolute right-0 top-0 mt-0 h-3 w-3 rounded-full bg-destructive"></span>
           )}
           <BellIcon className="text-background" />
@@ -132,7 +125,7 @@ export default function UserNotification() {
                 </TabsTrigger>
               </TabsList>
               <UserNotificationTab
-                list={listNotification}
+                list={listNotifications}
                 onArchive={handleArchive}
               />
               <UserNotificationTab
