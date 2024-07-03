@@ -39,6 +39,7 @@ const createColumn = (accessorKey: keyof Payment, label: string, sortable: boole
         {accessorKey === 'date_payment' || accessorKey === 'date_limit'
           ? new Date(cell.getValue() as Date).toLocaleDateString()
           : cell.getValue() as React.ReactNode}
+          
       </div>
     ),
   };
@@ -62,7 +63,7 @@ const createActionsColumn = (): ColumnDef<Payment> => {
        />  
       {/*Funcion para Eliminar pago seleccionado*/ }    
        <DeletePayments
-       id={row.original.id}
+       paymentdata={row.original}
        />
       </div>
     )
