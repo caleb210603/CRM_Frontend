@@ -76,6 +76,15 @@ html {
     gap: 1rem;
     grid-template-columns: repeat(auto-fit, minmax(300px,1fr));
   }
+
+  .scrollbar-hidden {
+    scrollbar-width: none; /* Para Firefox */
+    -ms-overflow-style: none; /* Para IE y Edge */
+  }
+
+  .scrollbar-hidden::-webkit-scrollbar {
+      display: none; /* Para Chrome, Safari y Opera */
+  }
 }
 
 /* hide increment/decrement  */
