@@ -13,65 +13,12 @@ export const NotificationContext = createContext<NotificationsProviderState>({
     websocket: null
 });
 
-const initialState = [
-    {
-        id: 1,        
-        title: 'title1',
-        notification: 'texto aleatorio',
-        user: {
-            name: 'jorge',
-            last_name: 'silva'
-        },
-        date: '11-11-11'
-    },
-    {
-        id: 1,
-        title: 'title1',
-        notification: 'texto aleatorio',
-        user: {
-            name: 'jorge',
-            last_name: 'silva'
-        },
-        date: '11-11-11'
-    },
-    {
-        id: 1,
-        title: 'title1',
-        notification: 'texto aleatorio',
-        user: {
-            name: 'jorge',
-            last_name: 'silva'
-        },
-        date: '11-11-11'
-    },
-    {
-        id: 1,
-        title: 'title1',
-        notification: 'texto aleatorio',
-        user: {
-            name: 'jorge',
-            last_name: 'silva'
-        },
-        date: '11-11-11'
-    },
-    {
-        id: 1,
-        title: 'title1',
-        notification: 'texto aleatorio',
-        user: {
-            name: 'jorge',
-            last_name: 'silva'
-        },
-        date: '11-11-11'
-    },
-]
-
 const NotificationProvider = ({children}: {children: ReactNode}) => {
-    const [notifications, setNotifications] = useState<Notification[]>(initialState);
+    const [notifications, setNotifications] = useState<Notification[]>([]);
     const [socket, setSocket] = useState<WebSocket | null>(null)
     
     useEffect(()=>{
-        const socketUrl = `ws://127.0.0.1:54375/ws/notifications/`;
+        const socketUrl = 'ws://127.0.0.1:8000/ws/notifications/';
     
         const websocket = new WebSocket(socketUrl);
 
@@ -80,8 +27,8 @@ const NotificationProvider = ({children}: {children: ReactNode}) => {
         }
     
         websocket.onmessage = (event)=>{
-            const data = JSON.parse(event.data);
-            console.log(data)            
+            const response = JSON.parse(event.data);
+            setNotifications(response.data)
         }
     
         websocket.onclose = () => {

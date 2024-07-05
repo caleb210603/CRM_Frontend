@@ -39,7 +39,7 @@ const Notifications = () => {
         title: 'New Notification',
         description: 'This is a new notification message.',
         user_id: 1,
-        date: new Date().toISOString()
+        date: new Date().toISOString().split('T')[0]
     };
 
     const createNotification = () => {                
@@ -47,7 +47,7 @@ const Notifications = () => {
     };
 
     return (
-        <div className="mb-6">
+        <div className="mb-6">            
             <Button onClick={createNotification}>Crear notificación</Button>            
             <div className="my-4 mb-6 grid-content">                
                 {
