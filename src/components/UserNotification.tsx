@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { BellIcon } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -8,104 +8,80 @@ import {
 } from "./ui/dropdown-menu";
 import { UserNotificationTab } from "./UserNotificationTab";
 import { Notification } from "@/types/notification";
-
-const list: Notification[] = [
-  {
-    id: 0,
-    title: "Felicidades",
-    notification:
-      "Esta es una prueba para ver el estado del texto en caso que ocupe todo el ancho alteracion para",
-    date: new Date("2023-11-01"),
-  },
-  {
-    id: 1,
-    title: "Error",
-    notification: "test1",
-    date: new Date("2023-11-01"),
-  },
-  {
-    id: 2,
-    title: "Titulo 2",
-    notification:
-      "test2 loremp ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quibusdam! loremp ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quibusdam!",
-    date: new Date("2023-11-01"),
-  },
-  {
-    id: 3,
-    title: "Titulo 3",
-    notification:
-      "loremp ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quibusdam!",
-    date: new Date("2023-11-01"),
-  },
-  {
-    id: 4,
-    title: "Titulo 4",
-    notification:
-      "lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quibusdam!",
-    date: new Date("2023-11-01"),
-  },
-  {
-    id: 5,
-    title: "Titulo 5",
-    notification:
-      "Esta es una prueba para ver el estado del texto en caso que ocupe todo el ancho para hacer una pruebaluego",
-    date: new Date("2023-11-01"),
-  },
-];
+import { useNotification } from "@/contexts/notification";
 
 export default function UserNotification() {  
-  const [listNotifications, setListNotifications] = useState(list);
-  const [archives, setArchives] = useState<Notification[]>([]);
-  const [notificationOpen, setNotificationOpen] = useState<boolean>(false);
-
-  const handleNotification = () => {
-    setNotificationOpen(!notificationOpen);
-  };
-
-  const handleArchive = (id: number) => {
-    const index = listNotifications.findIndex((item) => item.id === id);
-
-    if (index !== -1) {
-      const newElements = [...listNotifications];
-      const elementArchived = newElements.splice(index, 1)[0];
-      setListNotifications(newElements);
-      setArchives([elementArchived, ...archives]);
+  const { notifications } = useNotification();
+  const [notificationList, setNotificationList] = useState(notifications);
+  const prevNotifications = useRef(notifications);
+  const [archives, setArchives] = useState<Notification[]>([]);  
+  const [unreadCount, setUnreadCount] = useState(0);
+  const idUser = useRef<number>()
+  useEffect(()=>{
+    const userData = localStorage.getItem('userData');
+    if(userData) {
+      idUser.current = JSON.parse(userData).id      
     }
-  };
 
-  const restoreListNotification = (id: number) => {
-    const index = archives.findIndex((item) => item.id === id);
+  },[])
+  
+  //Función que marca a las notificaciones como leidas
+  //Es decir ya no se motrará la bola roja en la campanita
+  const markAllAsRead = ()=>{
+    console.log('erer')
+    setUnreadCount(0)
+  }
 
-    if (index !== -1) {
-      const newArchives = [...archives];
-      const elementRestored = newArchives.splice(index, 1)[0];
-      setArchives(newArchives);
-      setListNotifications([...listNotifications, elementRestored]);
+  //Verificamos si existen notificaciones sin leer, en caso de existir los mostraremos  en la campana
+  useEffect(()=>{
+    const difference = notifications.length - prevNotifications.current.length;    
+
+    if(difference > 0) {
+      setUnreadCount(difference)
     }
+  },[notifications])
+
+  const handleArchive = (id: number) => {    
   };
 
-  const deleteListArchives = (id: number) => {
-    const index = archives.findIndex((item) => item.id === id);
-    if (index !== -1) {
-      const newArchives = [...archives];
-      newArchives.splice(index, 1)[0];
-      setArchives(newArchives);
-    }
-  };
+  const restoreListNotification = (id: number) => {    
+  };  
+
+  useEffect(()=>{    
+    const newList = notifications.filter(noti=>{
+      if(idUser.current){        
+        if(noti.list_archives.includes(4)) {          
+          return false
+        }else {
+          return true
+        }        
+      } 
+      })
+      setNotificationList(newList);
+      const listArchives = notifications.filter(noti=>{
+        if(idUser.current){
+          if(noti.list_archives.includes(idUser.current)) {          
+            return true
+          }else {
+            return true
+          }        
+        } 
+        })
+        setArchives(listArchives)
+  },[notifications])
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger>
+    <DropdownMenu>      
+      <DropdownMenuTrigger >
         <div
-          className="relative p-[.4rem] rounded-full bg-primary cursor-pointer"
-          onClick={handleNotification}
+          className="relative p-[.4rem] rounded-full bg-primary cursor-pointer"          
         >
-          {listNotifications.length > 0 && (
-            <span className="absolute right-0 top-0 mt-0 h-3 w-3 rounded-full bg-destructive"></span>
+          {unreadCount > 0 && (
+            <span className="absolute right-[-5px] top-[-3px] mt-0 pr-[1px] h-3.5 w-3.5 rounded-full bg-destructive text-[10px] flex justify-center items-center">{unreadCount}</span>
           )}
           <BellIcon className="text-background" />
         </div>
-      </DropdownMenuTrigger>
+      </DropdownMenuTrigger>      
       <DropdownMenuContent className="w-[400px] lg:relative lg:right-[50%] pt-2">
         <div className=" h-[300px] rounded-md">
           <div>
@@ -125,14 +101,13 @@ export default function UserNotification() {
                 </TabsTrigger>
               </TabsList>
               <UserNotificationTab
-                list={listNotifications}
+                list={notificationList}
                 onArchive={handleArchive}
               />
               <UserNotificationTab
                 list={archives}
                 value="archivados"
-                onRestore={restoreListNotification}
-                onDelete={deleteListArchives}
+                onRestore={restoreListNotification}                
               />
             </Tabs>
           </div>

@@ -12,15 +12,14 @@ interface Props {
   value?: string;
   list: Notification[];
   onArchive?: (id: number) => void;
-  onRestore?: (id: number) => void;
-  onDelete?: (id: number) => void;
+  onRestore?: (id: number) => void;  
 }
 
 interface PropsItem extends Props {
   listNot: Notification;
 }
 
-function Item({ listNot, onArchive, onRestore, onDelete }: PropsItem) {
+function Item({ listNot, onArchive, onRestore }: PropsItem) {
   const [isCollapsed, setCollapsed] = useState(true);
 
   const handleClick = () => {
@@ -57,7 +56,7 @@ function Item({ listNot, onArchive, onRestore, onDelete }: PropsItem) {
             </Button>
           </div>
         )}
-        {onRestore && onDelete && (
+        {onRestore && (
           <div className="flex gap-3">
             <Button
               variant="ghost"
@@ -65,14 +64,7 @@ function Item({ listNot, onArchive, onRestore, onDelete }: PropsItem) {
               onClick={() => onRestore(listNot.id)}
             >
               <ArchiveRestore className="text-muted-foreground" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => onDelete(listNot.id)}
-            >
-              <ArchiveX className="text-muted-foreground" />
-            </Button>
+            </Button>        
           </div>
         )}
       </div>
@@ -85,8 +77,7 @@ export function UserNotificationTab({
   value = "notificaciones",
   list,
   onArchive,
-  onRestore,
-  onDelete,
+  onRestore  
 }: Props) {
   return (
     <TabsContent value={value}>
@@ -104,7 +95,6 @@ export function UserNotificationTab({
                     listNot={listNot}
                     onArchive={onArchive}
                     onRestore={onRestore}
-                    onDelete={onDelete}
                   />
                 ))}
             </CardContent>
