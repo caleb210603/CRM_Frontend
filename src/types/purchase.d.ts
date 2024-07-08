@@ -22,6 +22,7 @@ export interface PurchaseDetail {
     quantity: number;
     total: number;
     description: string;
+    purchase_obj: Purchase;
     created_at: Date; 
 }
 
@@ -45,6 +46,8 @@ export interface Payment {
     date_limit: string;
     payment_method: string;
     total: number;
+    purchase_obj: Purchase;
+    description_obj: string;
     cancelled_total: number;
-    status: string;
+    estatus: string;
 }
