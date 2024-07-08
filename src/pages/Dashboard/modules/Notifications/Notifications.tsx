@@ -1,8 +1,8 @@
-import { Button } from "@/components/ui/button"
 import NotificationCard from "./components/NotificationCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useEffect, useState } from "react";
 import { useNotification } from "@/contexts/notification";
+import CreateModal from "./components/CreateModal";
 
 const Notifications = () => {
     const loading = false;
@@ -32,23 +32,11 @@ const Notifications = () => {
     //Se llamará a la api para que carge las otras páginas de notificaciones cada vez que cambie el stado page
     useEffect(()=>{
         //Call api        
-    },[page])
-
-    const message = {
-        action: 'create',
-        title: 'New Notification',
-        description: 'This is a new notification message.',
-        user_id: 1,
-        date: new Date().toISOString().split('T')[0]
-    };
-
-    const createNotification = () => {                
-        websocket?.send(JSON.stringify(message))        
-    };
+    },[page])    
 
     return (
         <div className="mb-6">            
-            <Button onClick={createNotification}>Crear notificación</Button>            
+            <CreateModal/>              
             <div className="my-4 mb-6 grid-content">                
                 {
                     loading ? 

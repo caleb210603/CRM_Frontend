@@ -30,7 +30,7 @@ const NotificationCard: React.FC<Props> = ({notification})=> {
                     className="w-7 object-center object-cover aspect-square rounded-full" 
                     src="https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" 
                     alt=""  
-                />
+                    />
                 <span className="">name</span>    
             </div>
             <div className="flex justify-between gap-2">

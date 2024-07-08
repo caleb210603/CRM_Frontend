@@ -1,16 +1,18 @@
-import { Notification } from "@/types/notification";
+import { Notification, NotificationToCreate } from "@/types/notification";
 import { Dispatch, ReactNode, SetStateAction, createContext, useContext, useEffect, useState } from "react";
 
 interface NotificationsProviderState {
     notifications: Notification[],
     setNotifications: Dispatch<SetStateAction<Notification[]>>,    
-    websocket: WebSocket | null
+    websocket: WebSocket | null,
+    createNotification: (message: NotificationToCreate)=>void
 }
 
 export const NotificationContext = createContext<NotificationsProviderState>({
     notifications: [],
     setNotifications: () => {},
-    websocket: null
+    websocket: null,
+    createNotification: ()=>{}
 });
 
 const NotificationProvider = ({children}: {children: ReactNode}) => {
@@ -40,8 +42,8 @@ const NotificationProvider = ({children}: {children: ReactNode}) => {
                 })
                 setNotifications(notification_transformed)
             }                       
-        }
-    
+        }        
+
         websocket.onclose = () => {
             console.log('WebSocket disconnected');
         }
@@ -60,8 +62,12 @@ const NotificationProvider = ({children}: {children: ReactNode}) => {
         };
     }, []);
 
+    const createNotification = (message: NotificationToCreate) => {                
+        socket?.send(JSON.stringify(message))        
+    };
+
     return (
-        <NotificationContext.Provider value={{notifications, setNotifications, websocket: socket}}>
+        <NotificationContext.Provider value={{notifications, setNotifications, createNotification, websocket: socket}}>
             {children}
         </NotificationContext.Provider>
     );
