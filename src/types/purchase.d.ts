@@ -46,5 +46,7 @@ export interface Payment {
     payment_method: string;
     total: number;
     cancelled_total: number;
-    status: string;
+    estatus: string;
+    purchase_obj : Purchase;
+    description_obj: String;
 }

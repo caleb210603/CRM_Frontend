@@ -32,7 +32,7 @@ interface DeletePaymentsProps {
         formData.append("payment_method", paymentdata.payment_method)
         formData.append("total", paymentdata.total.toString())
         formData.append("cancelled_total", paymentdata.cancelled_total.toString())
-        formData.append("estatus", "Cancelado")
+        formData.append("estatus", "Eliminado")
         
         const response = await api.put(`payments/update/${paymentdata.id}`, formData);
   
