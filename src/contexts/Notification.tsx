@@ -34,8 +34,8 @@ const NotificationProvider = ({children}: {children: ReactNode}) => {
                 const notification_transformed = {...notification, date: new Date(notification.date)}
                 setNotifications(prevNotifications => [...prevNotifications, notification_transformed])
             }else if(response.type == 'notification_totallist') {
-                const notification = response.data as [];
-                const notification_transformed = notification.map((nt: Object)=>{
+                const notification = response.data as Notification[];
+                const notification_transformed = notification.map((nt)=>{
                     return {...nt, date: new Date(nt.date)}
                 })
                 setNotifications(notification_transformed)

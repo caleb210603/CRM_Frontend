@@ -4,9 +4,9 @@ import { TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Archive, ArchiveRestore, ArchiveX, Inbox } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import { Notification } from "@/components/UserNotification";
 import { useState } from "react";
 import { getDaysPassed } from "@/lib/utils";
+import { Notification } from "@/types/notification";
 
 interface Props {
   value?: string;

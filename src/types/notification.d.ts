@@ -3,9 +3,6 @@ export interface Notification {
     title: string;
     notification: string;
     date: Date;
-    user: {
-        name: string,
-        last_name: string
-    },
+    user_id: number,
     list_archives: number[]
 }

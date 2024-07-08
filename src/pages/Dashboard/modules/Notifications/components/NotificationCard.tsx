@@ -12,7 +12,7 @@ interface Props {
   notification: Notification
 }
 
-const NotificationCard: React.FC<Props> = ({notification})=> {
+const NotificationCard: React.FC<Props> = ({notification})=> {  
   return (
     <Card className="w-full">
         <div className="h-56 overflow-y-scroll scrollbar-hidden">
@@ -31,7 +31,7 @@ const NotificationCard: React.FC<Props> = ({notification})=> {
                     src="https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" 
                     alt=""  
                 />
-                <span className="">{notification.user.name}</span>    
+                <span className="">name</span>    
             </div>
             <div className="flex justify-between gap-2">
                 <Trash2 size={18} className="text-red-500"/>

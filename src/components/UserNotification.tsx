@@ -9,6 +9,15 @@ import {
 import { UserNotificationTab } from "./UserNotificationTab";
 import { Notification } from "@/types/notification";
 import { useNotification } from "@/contexts/notification";
+import { User } from "@/types/auth";
+import api from "@/services/api";
+import { useQuery } from "react-query";
+
+// Función para obtener el perfil del usuario autenticado (usando la misma interfaz User)
+const getUser = async (): Promise<User> => {
+  const { data } = await api.get<User>("/auth/profile");
+  return data;
+};
 
 export default function UserNotification() {  
   const { notifications } = useNotification();
@@ -16,19 +25,9 @@ export default function UserNotification() {
   const prevNotifications = useRef(notifications);
   const [archives, setArchives] = useState<Notification[]>([]);  
   const [unreadCount, setUnreadCount] = useState(0);
-  const idUser = useRef<number>()
-  useEffect(()=>{
-    const userData = localStorage.getItem('userData');
-    if(userData) {
-      idUser.current = JSON.parse(userData).id      
-    }
-
-  },[])
-  
-  //Función que marca a las notificaciones como leidas
-  //Es decir ya no se motrará la bola roja en la campanita
-  const markAllAsRead = ()=>{
-    console.log('erer')
+  const {data: userAuth} = useQuery<User>('user', getUser);    
+    
+  const markAllAsRead = ()=>{    
     setUnreadCount(0)
   }
 
@@ -47,27 +46,20 @@ export default function UserNotification() {
   const restoreListNotification = (id: number) => {    
   };  
 
+  //Función que valida si la notificación esta archivada o no
+  const validateArchives = ()=>{       
+    if(!userAuth) return;
+    console.log('userAuth:', userAuth.id)
+    const listArchives = notifications.filter(noti=>noti.list_archives.includes(userAuth.id));
+    const listNotArchives = notifications.filter(noti=>!noti.list_archives.includes(userAuth.id));
+    
+    setNotificationList(listNotArchives);
+    setArchives(listArchives)    
+  }
+
+  //Separamos las notificaciones por tipo archivados y no archivados cada vez que se actualizan las notificaciones
   useEffect(()=>{    
-    const newList = notifications.filter(noti=>{
-      if(idUser.current){        
-        if(noti.list_archives.includes(4)) {          
-          return false
-        }else {
-          return true
-        }        
-      } 
-      })
-      setNotificationList(newList);
-      const listArchives = notifications.filter(noti=>{
-        if(idUser.current){
-          if(noti.list_archives.includes(idUser.current)) {          
-            return true
-          }else {
-            return true
-          }        
-        } 
-        })
-        setArchives(listArchives)
+    validateArchives();
   },[notifications])
 
   return (
