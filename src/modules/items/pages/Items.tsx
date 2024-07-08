@@ -1,7 +1,7 @@
 import { useTitle } from "@/hooks/useTitle";
 import { ItemActions } from "../components/ItemActions";
 import { ItemDataTable } from "../components/ItemDataTable";
-import { Item } from "@/types/purchase";
+import { PurchaseDetail as Item } from "@/types/purchase";
 import api from "@/services/api";
 import { useQuery } from "react-query";
 import { User } from "@/types/auth";

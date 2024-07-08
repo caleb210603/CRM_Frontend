@@ -11,7 +11,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "react-query";
-import { Item } from "@/types/purchase";
+import { PurchaseDetail as Item } from "@/types/purchase";
 
 import { ItemEditForm } from "./ItemEditForm";
 import { ItemSchema } from "@/lib/validators/item";

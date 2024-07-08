@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Item as ItemType } from "@/types/purchase";
+import { PurchaseDetail as ItemType } from "@/types/purchase";
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 import { ActionsCell } from "./ActionsCell";
