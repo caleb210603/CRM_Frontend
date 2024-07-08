@@ -20,6 +20,8 @@ import { History } from "@/modules/expenses/pages/History";
 import { Payments } from "@/modules/expenses/pages/Payments";
 import Expenses from "@/modules/expenses/pages/Expenses";
 import DashboardPage from "@/pages/Dashboard/Dashboard";
+import { Items } from "@/modules/items/pages/Items";
+import { Providers } from "@/modules/provider/pages/Providers";
 
 const appRouter = [
   {
@@ -68,6 +70,14 @@ const appRouter = [
             element: <Payments />,
           },
         ],
+      },
+      {
+        path: "/items",
+        element: <Items />,
+      },
+      {
+        path: "/providers",
+        element: <Providers />,
       },
       // Expenses
       {
