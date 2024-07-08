@@ -22,14 +22,14 @@ const getUser = async (): Promise<User> => {
   return data;
 };
 
-
 export default function DashboardPage() {
   useTitle("Panel de control");
   
   const {data: userAuth} = useQuery<User>('user', getUser);
 
   const isAdmin = ()=> {
-    return userAuth?.role === 1;  
+    // return userAuth?.is_superuser;
+    return true
   }
 
   return (

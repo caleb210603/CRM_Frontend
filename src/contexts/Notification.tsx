@@ -31,7 +31,7 @@ const NotificationProvider = ({children}: {children: ReactNode}) => {
 
             if(response.type == 'notification_list') {      
                 const notification = response.data;
-                const notification_transformed = {...notification, date: new Date(notification.date)}
+                const notification_transformed = {...notification, date: new Date(notification.date)}                
                 setNotifications(prevNotifications => [...prevNotifications, notification_transformed])
             }else if(response.type == 'notification_totallist') {
                 const notification = response.data as Notification[];

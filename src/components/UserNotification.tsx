@@ -49,7 +49,7 @@ export default function UserNotification() {
   //Función que valida si la notificación esta archivada o no
   const validateArchives = ()=>{       
     if(!userAuth) return;
-    console.log('userAuth:', userAuth.id)
+    
     const listArchives = notifications.filter(noti=>noti.list_archives.includes(userAuth.id));
     const listNotArchives = notifications.filter(noti=>!noti.list_archives.includes(userAuth.id));
     
