@@ -1,17 +1,17 @@
-import { Notification, NotificationToCreate } from "@/types/notification";
+import { Notification, NotificationId, ResponseCreateNotification } from "@/types/notification";
 import { Dispatch, ReactNode, SetStateAction, createContext, useContext, useEffect, useState } from "react";
 
 interface NotificationsProviderState {
     notifications: Notification[],
     setNotifications: Dispatch<SetStateAction<Notification[]>>,    
-    websocket: WebSocket | null,
-    createNotification: (message: NotificationToCreate)=>void
+    deleteNotification: (message: NotificationId)=>void,
+    createNotification: (message: ResponseCreateNotification)=>void
 }
 
 export const NotificationContext = createContext<NotificationsProviderState>({
     notifications: [],
     setNotifications: () => {},
-    websocket: null,
+    deleteNotification: ()=>{},
     createNotification: ()=>{}
 });
 
@@ -62,12 +62,22 @@ const NotificationProvider = ({children}: {children: ReactNode}) => {
         };
     }, []);
 
-    const createNotification = (message: NotificationToCreate) => {                
-        socket?.send(JSON.stringify(message))        
+    const createNotification = (message: ResponseCreateNotification) => {                
+        socket?.send(JSON.stringify({
+            action: 'create',
+            ...message
+        }))                
     };
 
+    const deleteNotification = (id: NotificationId)=>{
+        socket?.send(JSON.stringify({
+            action: 'delete',
+            id
+        }))
+    }
+
     return (
-        <NotificationContext.Provider value={{notifications, setNotifications, createNotification, websocket: socket}}>
+        <NotificationContext.Provider value={{notifications, setNotifications, createNotification, deleteNotification}}>
             {children}
         </NotificationContext.Provider>
     );

@@ -1,5 +1,7 @@
+export type NotificationId = number;
+
 export interface Notification {
-    id: number;
+    id: NotificationId;
     title: string;
     description: string;
     date: Date;
@@ -7,4 +9,4 @@ export interface Notification {
     list_archives: number[]
 }
 
-export type NotificationToCreate = Omit<Notification, 'id' | 'list_archives'> & {action: string};
+export type ResponseCreateNotification = Omit<Notification, 'id' | 'list_archives'>;

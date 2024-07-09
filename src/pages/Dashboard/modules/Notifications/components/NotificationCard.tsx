@@ -6,19 +6,23 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Notification } from "@/types/notification"
-import { Pencil, Trash2 } from "lucide-react"
+import { Pencil } from "lucide-react"
+import DeleteModal from "./DeleteModal"
+import { useNotification } from "@/contexts/notification"
 
 interface Props {
   notification: Notification
 }
 
 const NotificationCard: React.FC<Props> = ({notification})=> {  
+  const { deleteNotification } = useNotification();      
+
   return (
-    <Card className="w-full">
-        <div className="h-56 overflow-y-scroll scrollbar-hidden">
-            <CardHeader className="w-full flex-row items-center flex justify-between">
+    <Card className=" flex flex-col w-full max-w-[450px]">
+        <div className="h-44 overflow-y-scroll scrollbar-hidden">
+            <CardHeader className="w-full flex-row items-top flex justify-between">
                 <CardTitle className="text-lg">{notification.title}</CardTitle>                   
-                <span className="pb-1 text-sm text-[#55587C]">Hace 2 minutos</span>             
+                <span className="pb-1.5 text-sm text-[#55587C] whitespace-nowrap">Hace 2 minutos</span>                             
             </CardHeader>
             <CardContent>        
                 <p>{notification.description}</p>
@@ -34,7 +38,7 @@ const NotificationCard: React.FC<Props> = ({notification})=> {
                 <span className="">name</span>    
             </div>
             <div className="flex justify-between gap-2">
-                <Trash2 size={18} className="text-red-500"/>
+                <DeleteModal handleDelete={()=>{deleteNotification(notification.id)}}/>                
                 <Pencil size={18} className="text-yellow-500"/>
             </div>
       </CardFooter>

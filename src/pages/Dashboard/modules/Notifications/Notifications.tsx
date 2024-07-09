@@ -7,7 +7,7 @@ import CreateModal from "./components/CreateModal";
 const Notifications = () => {
     const loading = false;
     const [page, setPage] = useState<number>(1);
-    const {notifications, setNotifications, websocket} = useNotification();    
+    const {notifications} = useNotification();    
 
     //Función que valida si el usuario llego al final de la página
     const handleScroll = ()=>{
@@ -37,7 +37,7 @@ const Notifications = () => {
     return (
         <div className="mb-6">            
             <CreateModal/>              
-            <div className="my-4 mb-6 grid-content">                
+            <div className="my-4 mb-6 grid-content max-w-[1400px]">                
                 {
                     loading ? 
                     <div className="flex flex-col gap-2">                    
@@ -56,7 +56,7 @@ const Notifications = () => {
                     notifications.map((notification, index)=>(
                         <NotificationCard key={index} notification={notification}/>                
                     ))
-                 }                
+                }                
             </div>            
         </div>
     );

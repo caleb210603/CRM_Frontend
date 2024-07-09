@@ -53,7 +53,7 @@ const CreateModal = () => {
         }
 
         setErrors({})
-        createNotification({action:'create', title, description, date, user_id})
+        createNotification({title, description, date, user_id})
         showSuccessfulToast();
         setIsOpen(false);
     }
