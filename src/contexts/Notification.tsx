@@ -31,7 +31,7 @@ const NotificationProvider = ({children}: {children: ReactNode}) => {
         websocket.onmessage = (event)=>{
             const response = JSON.parse(event.data)
 
-            if(response.type == 'notification_list') {      
+            if(response.type == 'single_notification') {      
                 const notification = response.data;
                 const notification_transformed = {...notification, date: new Date(notification.date)}                
                 setNotifications(prevNotifications => [...prevNotifications, notification_transformed])

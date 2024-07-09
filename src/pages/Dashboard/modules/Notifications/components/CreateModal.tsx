@@ -3,11 +3,31 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { ToastAction } from '@/components/ui/toast';
 import { useNotification } from '@/contexts/notification';
-import { FormEvent } from 'react';
+import { useToast } from '@/hooks/useToast';
+import { FormEvent, useState } from 'react';
+import { z } from 'zod';
+
+const notificationSchema = z.object({
+  title: z.string().min(1, "El título es requerido"),
+  description: z.string().min(1, "La descripción es requerida")
+});
 
 const CreateModal = () => {
     const { createNotification } = useNotification();    
+    const [isOpen, setIsOpen] = useState(false);
+    const [errors, setErrors] = useState<{ title?: string; description?: string }>({});
+    const { toast } = useToast();
+
+    const showSuccessfulToast = ()=>{
+      toast({
+        title: "Notificación creada correctamente",        
+        action: (
+          <ToastAction altText="Notificación creada correctamente">Cerrar</ToastAction>
+        ),
+      })
+    }
 
     const handleFormNotification = (e: FormEvent<HTMLFormElement>)=>{
         e.preventDefault();
@@ -16,14 +36,30 @@ const CreateModal = () => {
         const formData = new FormData(form);
         const title = formData.get('title') as string;        
         const description = formData.get('description') as string;
-        const date = new Date();
+        const date = (new Date()).toISOString().split('T')[0];
         const user_id = 1;
 
+        const validation = notificationSchema.safeParse({ title, description });
+
+        if (!validation.success) {
+          const newErrors = validation.error.errors.reduce((acc, error) => {
+            if (typeof error.path[0] === 'string') {
+              acc[error.path[0]] = error.message;
+            }
+            return acc;
+          }, {} as Record<string, string>);
+          setErrors(newErrors);
+          return;
+        }
+
+        setErrors({})
         createNotification({action:'create', title, description, date, user_id})
+        showSuccessfulToast();
+        setIsOpen(false);
     }
 
     return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>        
         <Button>Crear notificación</Button>      
       </DialogTrigger>
@@ -41,10 +77,16 @@ const CreateModal = () => {
           </div>          
           <div className="flex text-start flex-col items-start gap-4">
             <Label htmlFor="description" className="text-right">
-              Notificación
+              Description
             </Label>            
             <Textarea name='description' className='w-full'/>
           </div>          
+          {
+            errors.title &&
+            <div className='border border-[#E57373] text-sm pl-3 text-[#E57373] rounded-sm p-2.5'>
+              {errors.title}
+            </div>
+          }
         </div>
         <DialogFooter>
           <Button type="submit">Crear notificación</Button>

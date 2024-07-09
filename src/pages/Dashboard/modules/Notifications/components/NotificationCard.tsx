@@ -21,7 +21,7 @@ const NotificationCard: React.FC<Props> = ({notification})=> {
                 <span className="pb-1 text-sm text-[#55587C]">Hace 2 minutos</span>             
             </CardHeader>
             <CardContent>        
-                <p>{notification.notification}</p>
+                <p>{notification.description}</p>
             </CardContent>
         </div>
         <CardFooter className="flex border-t items-center py-3 justify-between">
