@@ -5,19 +5,25 @@ interface NotificationsProviderState {
     notifications: Notification[],
     setNotifications: Dispatch<SetStateAction<Notification[]>>,    
     deleteNotification: (message: NotificationId)=>void,
-    createNotification: (message: ResponseCreateNotification)=>void
+    createNotification: (message: ResponseCreateNotification)=>void,
+    getListNotifications: (page: number) =>void,
+    loading: boolean
 }
 
 export const NotificationContext = createContext<NotificationsProviderState>({
     notifications: [],
     setNotifications: () => {},
     deleteNotification: ()=>{},
-    createNotification: ()=>{}
+    createNotification: ()=>{},
+    getListNotifications: ()=>{},
+    loading: false
 });
 
 const NotificationProvider = ({children}: {children: ReactNode}) => {
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [socket, setSocket] = useState<WebSocket | null>(null)
+    const [hasNext, setHasNext] = useState(false);
+    const [loading, setLoading] = useState(false);
     
     useEffect(()=>{
         const socketUrl = 'ws://127.0.0.1:8000/ws/notifications/';
@@ -29,19 +35,23 @@ const NotificationProvider = ({children}: {children: ReactNode}) => {
         }
     
         websocket.onmessage = (event)=>{
-            const response = JSON.parse(event.data)
+            const response = JSON.parse(event.data)            
 
-            if(response.type == 'single_notification') {      
+            if(response.type == 'single-list') {      
                 const notification = response.data;
                 const notification_transformed = {...notification, date: new Date(notification.date)}                
                 setNotifications(prevNotifications => [...prevNotifications, notification_transformed])
-            }else if(response.type == 'notification_totallist') {
-                const notification = response.data as Notification[];
-                const notification_transformed = notification.map((nt)=>{
+            }else if(response.type == 'list-all') {
+                const has_next = response.has_next;
+                const notifications = response.notifications as Notification[];
+                const notifications_transformed = notifications.map((nt)=>{
                     return {...nt, date: new Date(nt.date)}
                 })
-                setNotifications(notification_transformed)
+                setNotifications(prevNotifications => [...prevNotifications, ...notifications_transformed])
+                setHasNext(has_next);
             }                       
+
+            setLoading(false);
         }        
 
         websocket.onclose = () => {
@@ -70,14 +80,24 @@ const NotificationProvider = ({children}: {children: ReactNode}) => {
     };
 
     const deleteNotification = (id: NotificationId)=>{
+        setLoading(true);
         socket?.send(JSON.stringify({
             action: 'delete',
             id
         }))
     }
+    
+    const getListNotifications = (page: number)=>{
+        if(!hasNext) return;
+        setLoading(true);
+        socket?.send(JSON.stringify({
+            action: 'list',
+            page
+        }))
+    }
 
     return (
-        <NotificationContext.Provider value={{notifications, setNotifications, createNotification, deleteNotification}}>
+        <NotificationContext.Provider value={{notifications, loading, getListNotifications, setNotifications, createNotification, deleteNotification}}>
             {children}
         </NotificationContext.Provider>
     );

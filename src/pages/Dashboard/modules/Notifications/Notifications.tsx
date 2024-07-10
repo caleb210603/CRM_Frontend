@@ -4,10 +4,9 @@ import { useEffect, useState } from "react";
 import { useNotification } from "@/contexts/notification";
 import CreateModal from "./components/CreateModal";
 
-const Notifications = () => {
-    const loading = false;
+const Notifications = () => {    
     const [page, setPage] = useState<number>(1);
-    const {notifications} = useNotification();    
+    const {loading, notifications, getListNotifications} = useNotification();    
 
     //Función que valida si el usuario llego al final de la página
     const handleScroll = ()=>{
@@ -31,7 +30,7 @@ const Notifications = () => {
 
     //Se llamará a la api para que carge las otras páginas de notificaciones cada vez que cambie el stado page
     useEffect(()=>{
-        //Call api        
+        getListNotifications(page);
     },[page])    
 
     return (
