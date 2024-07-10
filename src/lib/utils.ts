@@ -9,8 +9,33 @@ export function cn(...inputs: ClassValue[]) {
 
 export function getDaysPassed(date: Date) {
   const now = new Date();
-  const diffInTime = now.getTime() - date.getTime();
-  return "hace " + Math.floor(diffInTime / (1000 * 3600 * 24));
+  const diffInTime = now.getTime() - date.getTime();  
+
+  // Calcular el tiempo en diferentes unidades
+  const seconds = Math.floor(diffInTime / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+  const weeks = Math.floor(days / 7);
+  const months = Math.floor(days / 30);
+  const years = Math.floor(days / 365);
+
+  // Definir el formato de salida basado en la cantidad de tiempo pasado
+  if (years > 0) {
+      return years === 1 ? "hace 1 año" : `hace ${years} años`;
+  } else if (months > 0) {
+      return months === 1 ? "hace 1 mes" : `hace ${months} meses`;
+  } else if (weeks > 0) {
+      return weeks === 1 ? "hace 1 semana" : `hace ${weeks} semanas`;
+  } else if (days > 0) {
+      return days === 1 ? "hace 1 día" : `hace ${days} días`;
+  } else if (hours > 0) {
+      return hours === 1 ? "hace 1 hora" : `hace ${hours} horas`;
+  } else if (minutes > 0) {
+      return minutes === 1 ? "hace 1 minuto" : `hace ${minutes} minutos`;
+  } else {
+      return seconds <= 10 ? "hace unos segundos" : `hace ${seconds} segundos`;
+  }
 }
 
 export function formatDate(dateString: string): string {

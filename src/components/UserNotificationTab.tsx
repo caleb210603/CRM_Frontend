@@ -33,7 +33,7 @@ function Item({ listNot, onArchive, onRestore }: PropsItem) {
           <h3 className="text-md font-medium mb-1">
             {listNot.title}{" "}
             <span className="absolute right-0 font-light text-muted-foreground">
-              {getDaysPassed(listNot.date) + " dias"}
+              {getDaysPassed(listNot.date)}
             </span>
           </h3>
 
@@ -42,7 +42,7 @@ function Item({ listNot, onArchive, onRestore }: PropsItem) {
               isCollapsed && "text-muted-foreground line-clamp-2"
             }`}
           >
-            {listNot.notification}
+            {listNot.description}
           </p>
         </div>
         {onArchive && (

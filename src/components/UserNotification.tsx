@@ -26,7 +26,7 @@ export default function UserNotification() {
   const [archives, setArchives] = useState<Notification[]>([]);  
   const [unreadCount, setUnreadCount] = useState(0);
   const {data: userAuth} = useQuery<User>('user', getUser);    
-    
+      
   const markAllAsRead = ()=>{    
     setUnreadCount(0)
   }
@@ -38,6 +38,7 @@ export default function UserNotification() {
     if(difference > 0) {
       setUnreadCount(difference)
     }
+    prevNotifications.current = notifications;
   },[notifications])
 
   const handleArchive = (id: number) => {    
@@ -63,17 +64,17 @@ export default function UserNotification() {
   },[notifications])
 
   return (
-    <DropdownMenu>      
-      <DropdownMenuTrigger >
+    <DropdownMenu onOpenChange={markAllAsRead}>          
+      <DropdownMenuTrigger>
         <div
           className="relative p-[.4rem] rounded-full bg-primary cursor-pointer"          
-        >
+          >
           {unreadCount > 0 && (
             <span className="absolute right-[-5px] top-[-3px] mt-0 pr-[1px] h-3.5 w-3.5 rounded-full bg-destructive text-[10px] flex justify-center items-center">{unreadCount}</span>
           )}
           <BellIcon className="text-background" />
         </div>
-      </DropdownMenuTrigger>      
+      </DropdownMenuTrigger>            
       <DropdownMenuContent className="w-[400px] lg:relative lg:right-[50%] pt-2">
         <div className=" h-[300px] rounded-md">
           <div>

@@ -9,6 +9,7 @@ import { Notification } from "@/types/notification"
 import { Pencil } from "lucide-react"
 import DeleteModal from "./DeleteModal"
 import { useNotification } from "@/contexts/notification"
+import { getDaysPassed } from "@/lib/utils"
 
 interface Props {
   notification: Notification
@@ -22,7 +23,7 @@ const NotificationCard: React.FC<Props> = ({notification})=> {
         <div className="h-44 overflow-y-scroll scrollbar-hidden">
             <CardHeader className="w-full flex-row items-top flex justify-between">
                 <CardTitle className="text-lg">{notification.title}</CardTitle>                   
-                <span className="pb-1.5 text-sm text-[#55587C] whitespace-nowrap">Hace 2 minutos</span>                             
+                <span className="pb-1.5 text-sm text-[#55587C] whitespace-nowrap">{getDaysPassed(notification.date)}</span>                             
             </CardHeader>
             <CardContent>        
                 <p>{notification.description}</p>

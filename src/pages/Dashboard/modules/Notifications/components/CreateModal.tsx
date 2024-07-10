@@ -36,7 +36,7 @@ const CreateModal = () => {
         const formData = new FormData(form);
         const title = formData.get('title') as string;        
         const description = formData.get('description') as string;
-        const date = (new Date()).toISOString().split('T')[0];
+        const date = new Date();                                                    
         const user_id = 1;
 
         const validation = notificationSchema.safeParse({ title, description });
