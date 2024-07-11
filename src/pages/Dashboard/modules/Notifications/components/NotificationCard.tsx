@@ -10,13 +10,16 @@ import { Pencil } from "lucide-react"
 import DeleteModal from "./DeleteModal"
 import { useNotification } from "@/contexts/notification"
 import { getDaysPassed } from "@/lib/utils"
+import { User } from "@/types/auth"
 
 interface Props {
-  notification: Notification
+  notification: Notification,
+  infoPerfil: Pick<User, 'name' | 'image'>[],
+  index: number
 }
 
-const NotificationCard: React.FC<Props> = ({notification})=> {  
-  const { deleteNotification } = useNotification();      
+const NotificationCard: React.FC<Props> = ({notification, infoPerfil, index})=> {  
+  const { deleteNotification } = useNotification();  
 
   return (
     <Card className=" flex flex-col w-full max-w-[450px]">
@@ -31,12 +34,21 @@ const NotificationCard: React.FC<Props> = ({notification})=> {
         </div>
         <CardFooter className="flex border-t items-center py-3 justify-between">
             <div className="flex gap-2 items-center">
-                <img 
-                    className="w-7 object-center object-cover aspect-square rounded-full" 
-                    src="https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" 
-                    alt=""  
-                    />
-                <span className="">name</span>    
+              <div
+                className="w-7 aspect-square rounded-full overflow-hidden"
+              >
+                {
+                  infoPerfil[index].image != null ? 
+                  <img 
+                      className="w-full h-full object-center object-cover" 
+                      src={infoPerfil[index].image.toString()}
+                      alt="imagen de perfil"  
+                  />
+                  :
+                  <div>{infoPerfil[index].name.slice(1,0).toUpperCase()}</div>
+                }
+              </div>
+                <span className="">{infoPerfil[index].name}</span>    
             </div>
             <div className="flex justify-between gap-2">
                 <DeleteModal handleDelete={()=>{deleteNotification(notification.id)}}/>                

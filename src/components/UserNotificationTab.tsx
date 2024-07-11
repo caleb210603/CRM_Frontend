@@ -87,7 +87,6 @@ export function UserNotificationTab({
             <CardContent className="space-y-2 px-4 pt-3">
               {list
                 .slice()
-                .reverse()
                 .map((listNot) => (
                   <Item
                     key={listNot.id}

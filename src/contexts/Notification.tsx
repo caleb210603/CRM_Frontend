@@ -40,7 +40,7 @@ const NotificationProvider = ({children}: {children: ReactNode}) => {
             if(response.type == 'single-list') {      
                 const notification = response.data;
                 const notification_transformed = {...notification, date: new Date(notification.date)}                
-                setNotifications(prevNotifications => [...prevNotifications, notification_transformed])
+                setNotifications(prevNotifications => [notification_transformed, ...prevNotifications])
             }else if(response.type == 'list-all') {
                 const has_next = response.has_next;
                 const notifications = response.notifications as Notification[];

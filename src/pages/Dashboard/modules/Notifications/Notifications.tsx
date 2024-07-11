@@ -3,10 +3,35 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useEffect, useState } from "react";
 import { useNotification } from "@/contexts/notification";
 import CreateModal from "./components/CreateModal";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Terminal } from "lucide-react";
+import api from "@/services/api";
+import { User } from "@/types/auth";
+
+const getUserById = async (id: number): Promise<User>=> {
+    const {data} = await api.get<User>(`/users/${id}`);
+    return data;
+}
 
 const Notifications = () => {    
     const [page, setPage] = useState<number>(1);
     const {loading, notifications, getListNotifications} = useNotification();    
+    const [infoPerfil, setInfoPerfil] = useState<Pick<User, 'name' | 'image'>[]>([]);    
+
+    useEffect(()=>{
+        const listPromise = notifications.map(noti=>{
+            return getUserById(noti.user_id)
+        })
+
+        Promise.all(listPromise)
+            .then(response=>{
+                if(!response) return;
+                response.map(user => {
+                    setInfoPerfil(prev=> [...prev,{name: user.name, image:user.image}])
+                })
+            })
+            .catch(error => console.log(error))
+    },[notifications]);
 
     //Función que valida si el usuario llego al final de la página
     const handleScroll = ()=>{
@@ -52,9 +77,18 @@ const Notifications = () => {
                         </div>
                     </div>
                     :
-                    notifications.map((notification, index)=>(
-                        <NotificationCard key={index} notification={notification}/>                
-                    ))
+                    notifications.length > 0 && infoPerfil.length > 0 ?
+                        notifications.map((notification, index)=>(
+                            <NotificationCard key={index} index={index} infoPerfil={infoPerfil} notification={notification}/>                
+                        ))
+                    :
+                    <Alert>
+                        <Terminal className="h-4 w-4" />
+                        <AlertTitle>No se encontrarón notificaciones en la base de datos</AlertTitle>
+                        <AlertDescription>
+                            Puedes crear una nueva notificación presionando el boton
+                        </AlertDescription>
+                    </Alert>
                 }                
             </div>            
         </div>
