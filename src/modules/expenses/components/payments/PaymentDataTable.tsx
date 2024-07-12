@@ -80,6 +80,7 @@ import { Input } from "@/components/ui/input";
               <option value="Completado">Completado</option>
               <option value="Pendiente">Pendiente</option>
               <option value="Vencido">Vencido</option>
+              <option value="Eliminado">Eliminados</option>
             </select>
             {/*-----------------------------------------------------*/}
             <div className="p-4">

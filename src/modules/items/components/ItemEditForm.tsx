@@ -12,7 +12,7 @@ import { z } from "zod";
 import { toast } from "@/hooks/useToast";
 import api from "@/services/api";
 import { useQueryClient } from "react-query";
-import { Item } from "@/types/purchase";
+import { PurchaseDetail as Item } from "@/types/purchase";
 import { ItemSchema } from "@/lib/validators/item";
 import { ChangeEvent, useEffect, useState } from "react";
 import { UseFormReturn } from "react-hook-form";
