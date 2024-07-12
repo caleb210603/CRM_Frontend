@@ -20,7 +20,7 @@ const getUser = async (): Promise<User> => {
 };
 
 export default function UserNotification() {  
-  const { notifications } = useNotification();
+  const { notifications, archiveNotification, unarchiveNotification } = useNotification();
   const [notificationList, setNotificationList] = useState(notifications);
   const prevNotifications = useRef(notifications);
   const [archives, setArchives] = useState<Notification[]>([]);  
@@ -42,9 +42,13 @@ export default function UserNotification() {
   },[notifications])
 
   const handleArchive = (id: number) => {    
+    if(!userAuth) return
+    archiveNotification(userAuth.id ,id);
   };
-
+  
   const restoreListNotification = (id: number) => {    
+    if(!userAuth) return    
+    unarchiveNotification(userAuth.id, id)
   };  
 
   //Función que valida si la notificación esta archivada o no

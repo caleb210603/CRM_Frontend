@@ -9,4 +9,4 @@ export interface Notification {
     list_archives: number[]
 }
 
-export type ResponseCreateNotification = Omit<Notification, 'id' | 'list_archives'>;
+export type ResponseCreateNotification = Omit<Notification, 'id'>;

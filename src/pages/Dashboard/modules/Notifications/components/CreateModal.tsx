@@ -5,8 +5,9 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { ToastAction } from '@/components/ui/toast';
 import { useNotification } from '@/contexts/notification';
+import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/useToast';
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useRef, useState } from 'react';
 import { z } from 'zod';
 
 const notificationSchema = z.object({
@@ -19,6 +20,13 @@ const CreateModal = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [errors, setErrors] = useState<{ title?: string; description?: string }>({});
     const { toast } = useToast();
+    const userAuth = useAuth();  
+    const user_id = useRef<number>()
+  
+    useEffect(()=>{
+      if(!userAuth.user) return;
+      user_id.current = userAuth.user.id;
+    },[userAuth])
 
     const showSuccessfulToast = ()=>{
       toast({
@@ -36,8 +44,7 @@ const CreateModal = () => {
         const formData = new FormData(form);
         const title = formData.get('title') as string;        
         const description = formData.get('description') as string;
-        const date = new Date();                                                    
-        const user_id = 1;
+        const date = new Date();                                                            
 
         const validation = notificationSchema.safeParse({ title, description });
 
@@ -51,9 +58,10 @@ const CreateModal = () => {
           setErrors(newErrors);
           return;
         }
-
+  
+        if(!user_id.current) return
         setErrors({})
-        createNotification({title, description, date, user_id})
+        createNotification({title, description, date, user_id: user_id.current, list_archives: []})
         showSuccessfulToast();
         setIsOpen(false);
     }

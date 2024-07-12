@@ -8,8 +8,10 @@ interface NotificationsProviderState {
     setNotifications: React.Dispatch<React.SetStateAction<Notification[]>>;
     deleteNotification: (id: NotificationId) => void;
     createNotification: (notification: ResponseCreateNotification) => void;
+    updateNotification: (notification: Notification) => void;
     getListNotifications: (page: number) => void;
     loading: boolean;
+    unarchiveNotification: (userId: number, notificationId: number) => void;
     archiveNotification: (userId: number, notificationId: number) => void;
 }
 
@@ -21,7 +23,9 @@ export const NotificationContext = createContext<NotificationsProviderState>({
     createNotification: () => {},
     getListNotifications: () => {},
     loading: false,
-    archiveNotification: () => {}
+    archiveNotification: () => {},
+    unarchiveNotification: () => {},
+    updateNotification: ()=>{}
 });
 
 // Proveedor de notificaciones
@@ -43,6 +47,8 @@ const NotificationProvider = ({ children }: { children: ReactNode }) => {
         deleteNotification,
         archiveNotification,
         getListNotifications,
+        updateNotification,
+        unarchiveNotification,
         loading,
     } = useWebSocket({ onNotificationReceived, onNotificationsListReceived, hasNext });
 
@@ -55,7 +61,9 @@ const NotificationProvider = ({ children }: { children: ReactNode }) => {
                 createNotification,
                 getListNotifications,
                 loading,
+                unarchiveNotification,
                 archiveNotification,
+                updateNotification
             }}
         >
             {children}

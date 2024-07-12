@@ -17,22 +17,25 @@ const Notifications = () => {
     const [page, setPage] = useState<number>(1);
     const {loading, notifications, getListNotifications} = useNotification();    
     const [infoPerfil, setInfoPerfil] = useState<Pick<User, 'name' | 'image'>[]>([]);    
+    const [loadingPerfil, setLoadingPerfil] = useState(false);
 
     useEffect(()=>{
+        setLoadingPerfil(true);
         const listPromise = notifications.map(noti=>{
             return getUserById(noti.user_id)
         })
-
+        
         Promise.all(listPromise)
-            .then(response=>{
-                if(!response) return;
-                response.map(user => {
-                    setInfoPerfil(prev=> [...prev,{name: user.name, image:user.image}])
-                })
-            })
-            .catch(error => console.log(error))
-    },[notifications]);
+        .then(response=>{
+            if(!response) return;
+            const listInfo = response.map(user => {return {name: user.name, image: user.image}})
 
+            setInfoPerfil(listInfo);
+            setLoadingPerfil(false);
+        })
+        .catch(error => console.log(error))
+    },[notifications]);
+    
     //Función que valida si el usuario llego al final de la página
     const handleScroll = ()=>{
         if (loading) return; // Si ya estamos cargando datos, no hacer nada
@@ -77,7 +80,7 @@ const Notifications = () => {
                         </div>
                     </div>
                     :
-                    notifications.length > 0 && infoPerfil.length > 0 ?
+                    notifications.length > 0 && infoPerfil.length > 0 && !loadingPerfil?
                         notifications.map((notification, index)=>(
                             <NotificationCard key={index} index={index} infoPerfil={infoPerfil} notification={notification}/>                
                         ))

@@ -63,9 +63,22 @@ const useWebSocket = ({ onNotificationReceived, hasNext, onNotificationsListRece
         }
     };
 
+    const updateNotification = (notification: Notification) => {
+        if(socket) {
+            setLoading(true);
+            socket.send(JSON.stringify({action:'update', ...notification}))
+        }
+    }
+
     const archiveNotification = (userId: number, notificationId: number) => {
         if (socket) {
             socket.send(JSON.stringify({ action: 'archive', notification_id: notificationId, user_id: userId }));
+        }
+    };
+
+    const unarchiveNotification = (userId: number, notificationId: number) => {
+        if (socket) {
+            socket.send(JSON.stringify({ action: 'unarchive', notification_id: notificationId, user_id: userId }));
         }
     };
 
@@ -82,6 +95,8 @@ const useWebSocket = ({ onNotificationReceived, hasNext, onNotificationsListRece
         deleteNotification,
         archiveNotification,
         getListNotifications,
+        unarchiveNotification,
+        updateNotification,
         loading,
     };
 };

@@ -6,11 +6,11 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Notification } from "@/types/notification"
-import { Pencil } from "lucide-react"
 import DeleteModal from "./DeleteModal"
 import { useNotification } from "@/contexts/notification"
 import { getDaysPassed } from "@/lib/utils"
 import { User } from "@/types/auth"
+import EditModal from "./EditModal"
 
 interface Props {
   notification: Notification,
@@ -19,8 +19,8 @@ interface Props {
 }
 
 const NotificationCard: React.FC<Props> = ({notification, infoPerfil, index})=> {  
-  const { deleteNotification } = useNotification();  
-
+  const { deleteNotification } = useNotification();    
+  console.log(infoPerfil)
   return (
     <Card className=" flex flex-col w-full max-w-[450px]">
         <div className="h-44 overflow-y-scroll scrollbar-hidden">
@@ -52,7 +52,7 @@ const NotificationCard: React.FC<Props> = ({notification, infoPerfil, index})=> 
             </div>
             <div className="flex justify-between gap-2">
                 <DeleteModal handleDelete={()=>{deleteNotification(notification.id)}}/>                
-                <Pencil size={18} className="text-yellow-500"/>
+                <EditModal idNotification={notification.id}/>
             </div>
       </CardFooter>
     </Card>
