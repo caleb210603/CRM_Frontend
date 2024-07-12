@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Notification, NotificationId, ResponseCreateNotification } from "@/types/notification";
-import { id } from "date-fns/locale";
 
 interface UseWebSocketProps {
     onNotificationReceived: (notification: Notification) => void;
@@ -22,6 +21,7 @@ const useWebSocket = ({ onNotificationReceived, hasNext, onNotificationsListRece
 
         websocket.onmessage = (event) => {
             const response = JSON.parse(event.data);
+                        
             if (response.type === 'single-list') {
                 const notification = { ...response.data, date: new Date(response.data.date) };
                 onNotificationReceived(notification);
@@ -52,6 +52,7 @@ const useWebSocket = ({ onNotificationReceived, hasNext, onNotificationsListRece
 
     const createNotification = (notification: ResponseCreateNotification) => {
         if (socket) {
+            setLoading(true);
             socket.send(JSON.stringify({ action: 'create', ...notification }));
         }
     };

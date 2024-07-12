@@ -33,11 +33,11 @@ const NotificationProvider = ({ children }: { children: ReactNode }) => {
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [hasNext, setHasNext] = useState(false);
 
-    const onNotificationReceived = (notification: Notification) => {
+    const onNotificationReceived = (notification: Notification) => {                            
         setNotifications(prevNotifications => [notification, ...prevNotifications]);
     };
-
-    const onNotificationsListReceived = (notifications: Notification[], hasNext: boolean) => {
+    
+    const onNotificationsListReceived = (notifications: Notification[], hasNext: boolean) => {        
         setNotifications(prevNotifications => [...prevNotifications, ...notifications]);
         setHasNext(hasNext);
     };

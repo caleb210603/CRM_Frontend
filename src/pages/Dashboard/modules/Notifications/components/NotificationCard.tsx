@@ -14,13 +14,12 @@ import EditModal from "./EditModal"
 
 interface Props {
   notification: Notification,
-  infoPerfil: Pick<User, 'name' | 'image'>[],
-  index: number
+  infoPerfil: Pick<User, 'name' | 'image'>,  
 }
 
-const NotificationCard: React.FC<Props> = ({notification, infoPerfil, index})=> {  
+const NotificationCard: React.FC<Props> = ({notification, infoPerfil})=> {  
   const { deleteNotification } = useNotification();    
-  console.log(infoPerfil)
+    
   return (
     <Card className=" flex flex-col w-full max-w-[450px]">
         <div className="h-44 overflow-y-scroll scrollbar-hidden">
@@ -38,17 +37,17 @@ const NotificationCard: React.FC<Props> = ({notification, infoPerfil, index})=> 
                 className="w-7 aspect-square rounded-full overflow-hidden"
               >
                 {
-                  infoPerfil[index].image != null ? 
+                  infoPerfil?.image != null ? 
                   <img 
                       className="w-full h-full object-center object-cover" 
-                      src={infoPerfil[index].image.toString()}
+                      src={infoPerfil?.image.toString()}
                       alt="imagen de perfil"  
                   />
                   :
-                  <div>{infoPerfil[index].name.slice(1,0).toUpperCase()}</div>
+                  <div>{infoPerfil?.name.slice(1,0).toUpperCase()}</div>
                 }
               </div>
-                <span className="">{infoPerfil[index].name}</span>    
+              <span className="">{infoPerfil?.name}</span>    
             </div>
             <div className="flex justify-between gap-2">
                 <DeleteModal handleDelete={()=>{deleteNotification(notification.id)}}/>                

@@ -19,8 +19,8 @@ const Notifications = () => {
     const [infoPerfil, setInfoPerfil] = useState<Pick<User, 'name' | 'image'>[]>([]);    
     const [loadingPerfil, setLoadingPerfil] = useState(false);
 
-    useEffect(()=>{
-        setLoadingPerfil(true);
+    useEffect(()=>{                
+        setLoadingPerfil(true);        
         const listPromise = notifications.map(noti=>{
             return getUserById(noti.user_id)
         })
@@ -29,7 +29,7 @@ const Notifications = () => {
         .then(response=>{
             if(!response) return;
             const listInfo = response.map(user => {return {name: user.name, image: user.image}})
-
+                        
             setInfoPerfil(listInfo);
             setLoadingPerfil(false);
         })
@@ -38,15 +38,15 @@ const Notifications = () => {
     
     //Función que valida si el usuario llego al final de la página
     const handleScroll = ()=>{
-        if (loading) return; // Si ya estamos cargando datos, no hacer nada
+        // if (loading) return; // Si ya estamos cargando datos, no hacer nada
 
-        const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-        const scrollHeight = document.documentElement.scrollHeight;
-        const clientHeight = window.innerHeight;
+        // const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+        // const scrollHeight = document.documentElement.scrollHeight;
+        // const clientHeight = window.innerHeight;
 
-        if (scrollTop + clientHeight >= scrollHeight) {
-            setPage(prevPage=>prevPage + 1);
-        }
+        // if (scrollTop + clientHeight >= scrollHeight) {
+        //     setPage(prevPage=>prevPage + 1);
+        // }
     }
 
     //Cada vez que se haga scroll se validara si el usuario llegó al final de la página
@@ -82,7 +82,7 @@ const Notifications = () => {
                     :
                     notifications.length > 0 && infoPerfil.length > 0 && !loadingPerfil?
                         notifications.map((notification, index)=>(
-                            <NotificationCard key={index} index={index} infoPerfil={infoPerfil} notification={notification}/>                
+                            <NotificationCard key={index} infoPerfil={infoPerfil[index]} notification={notification}/>                
                         ))
                     :
                     <Alert>
