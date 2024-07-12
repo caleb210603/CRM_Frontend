@@ -17,7 +17,6 @@ export const getPaymentType = (paymentType: number): string => {
     }
   };
 
-
   export const getPaymentTypeWhitIcon = (paymentType: number): JSX.Element => {
     switch (paymentType) {
       case 0:

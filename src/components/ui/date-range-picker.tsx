@@ -16,8 +16,6 @@ import {
 
 interface DatePickerWithRangeProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> {
   onChange?: (date: DateRange | undefined) => void;
-
-
 }
 
 export function DatePickerWithRange({
@@ -40,7 +38,7 @@ export function DatePickerWithRange({
       <button
         id="date"
         className={cn(
-          "w-[300px] flex items-center justify-between text-left font-normal border-2  rounded-full shadow-md px-4 py-2 hover:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500",
+          "w-[300px] flex items-center justify-between text-left font-normal border-2  rounded-lg shadow px-4 py-2 hover:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500",
           !date && "text-gray-500"
         )}
       >
@@ -55,7 +53,7 @@ export function DatePickerWithRange({
               format(date.from, "LLL dd, y")
             )
           ) : (
-            <span>Pick a date</span>
+            <span>Elija una fecha</span>
           )}
         </div>
         <svg className="h-4 w-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
