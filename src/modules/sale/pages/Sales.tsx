@@ -29,6 +29,7 @@ export function Sales() {
       <div className="w-80">
         <CustomerSearch setSearch={setSearch} />
       </div>
+      
       <div className="mt-4 lg:mt-0 lg:ml-2">
         <DatePickerWithRange className="w-80" onChange={handleDateChange}/>
       </div>

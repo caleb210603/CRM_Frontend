@@ -36,6 +36,7 @@
     "@radix-ui/react-tooltip": "^1.0.7",
     "@react-pdf/renderer": "^3.4.2",
     "@reduxjs/toolkit": "^1.9.7",
+    "@shadcn/ui": "^0.0.4",
     "@tanstack/match-sorter-utils": "^8.8.4",
     "@tanstack/react-table": "^8.10.7",
     "accounting": "^0.4.1",

@@ -1,7 +1,7 @@
 import React from 'react';
 import { FaCircleExclamation } from 'react-icons/fa6';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from "@/components/ui/table";
-import { useSearchPurchase } from './hooks/SearchPurchase';
+import { useSearchPurchase } from '../hooks/SearchPurchase';
 import ModalContainer from './ModalContainer';
 
 interface TableModalProps {
@@ -25,10 +25,10 @@ const TableModal: React.FC<TableModalProps> = ({ isOpen, closeModal, purchaseId 
 
         {selectedPurchase ? (
           <div className="grid grid-cols-2 gap-2">
-            <p className="text-sm"><strong>FECHA:</strong> {new Date(selectedPurchase.date_purchase).toLocaleDateString()}</p>
-            <p className="text-sm"><strong>CLIENTE:</strong> {selectedPurchase.purchase_obj.description}</p>
+            <p className="text-sm"><strong>FECHA:</strong> 19/05/03</p>
+            <p className="text-sm"><strong>CLIENTE:</strong> Arnold Campos</p>
             <p className="text-sm"><strong>MODO DE PAGO:</strong> Trajeta de Credito</p>
-            <p className="text-sm"><strong>FACTURA:</strong> </p>
+            <p className="text-sm"><strong>FACTURA: XXXX</strong> </p>
           </div>
         ) : (
           <p className="text-sm">No se encontraron detalles para esta compra.</p>

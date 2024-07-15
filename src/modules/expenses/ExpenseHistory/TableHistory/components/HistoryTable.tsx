@@ -6,18 +6,21 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ChevronDown } from "lucide-react";
 import { SortingState, VisibilityState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table";
 import { columns } from "./FilterRow";
-import { usePurchaseHistory } from "./hooks/SearchHistory";
 import CalendaryTable from "./CalendaryTable";
 import { ExportToCSV } from "./exportToCSV";
+import { DateRange } from 'react-day-picker';
+import { useFilteredPurchases } from "./useFilteredPurchases";
+
 
 export function HistoryTable() {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
-  const { purchasesDataHistory } = usePurchaseHistory();
+  const [selectedDateRange, setSelectedDateRange] = React.useState<DateRange | undefined>();
+  const filteredData = useFilteredPurchases(selectedDateRange);
 
   const table = useReactTable({
-    data: purchasesDataHistory,
+    data: filteredData,
     columns,
     state: {
       sorting,
@@ -36,11 +39,14 @@ export function HistoryTable() {
   return (
     <div className="w-full">
       <div>
-      <CalendaryTable
-       />
 
+        {/* CalendaryTable con manejador de cambio */}
+        <CalendaryTable onChange={setSelectedDateRange} />
       </div>
+
       <div className="flex items-center py-4">
+
+        {/* INPUT SEARCH */}
         <Input
           placeholder="Filtrar por numero de factura"
           className="max-w-sm"
@@ -49,14 +55,22 @@ export function HistoryTable() {
           }
         />
 
+
         <div className="flex items-center space-x-2 ml-auto">
-          <ExportToCSV data={purchasesDataHistory} filename="Historial de compra.csv" />
+          {/* EXPORT TO EXCEL */}
+          <ExportToCSV data={filteredData} filename="Historial de compra.csv" />
+
+
+          {/* FILTER COLUMNS */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline">
                 Columns <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
+
+
+            {/* LIST COLUMNS */}
             <DropdownMenuContent align="end">
               {table
                 .getAllColumns()
@@ -76,6 +90,8 @@ export function HistoryTable() {
         </div>
       </div>
 
+
+      {/* HEADER TABLE */}
       <div className="rounded-md border text-center">
         <Table>
           <TableHeader>
@@ -89,6 +105,9 @@ export function HistoryTable() {
               </TableRow>
             ))}
           </TableHeader>
+
+
+          {/* TABLA DATE ENDPOINTS */}
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
@@ -110,15 +129,20 @@ export function HistoryTable() {
           </TableBody>
         </Table>
       </div>
-
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
+
+
+          {/* COUNT TABLE */}
           {table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
         <div className="space-x-2">
+          {/* PREVIOUS AND NEXT */}
+
+
           <Button
             variant="outline"
-            size="sm" 
+            size="sm"
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >

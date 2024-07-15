@@ -1,9 +1,10 @@
 import { useState } from "react";
+import AlertDelete from "./AlertDelete";
+import { FilterArrow } from "./FilterArrow";
 import { Purchase } from "src/types/purchase";
 import { Button } from "@/components/ui/button";
-import { FilterArrow } from "./FilterArrow";
 import { ColumnDef } from "@tanstack/react-table";
-import TableModal from "../TableModal/TableModal";
+import TableModal from "../../TableModal/components/TableModal";
 
 export const columns: ColumnDef<Purchase>[] = [
   {
@@ -14,33 +15,53 @@ export const columns: ColumnDef<Purchase>[] = [
       </div>
     ),
     cell: ({ row }) => {
-      const [isModalOpen, setIsModalOpen] = useState(false);
+      const [modalType, setModalType] = useState<'table' | 'alertDelete' | null>(null);
       const [selectedId, setSelectedId] = useState<number | null>(null);
 
-      const handleOpenModal = (id: number) => {
+      const openModal = (type: 'table' | 'alertDelete', id: number) => {
         setSelectedId(id);
-        setIsModalOpen(true);
+        setModalType(type);
+      };
+
+      const closeModal = () => {
+        setModalType(null);
+        setSelectedId(null);
       };
 
       return (
         <div className="flex justify-center space-x-1">
           <Button
-            variant="destructive"
-            className="rounded w-8 h-8"
+            variant="default"
+            className="rounded w-8 h-8 bg-red-600"
+            onClick={() => openModal('alertDelete', row.original.id)}
           >
             x
           </Button>
-
+        
 
           <Button
             variant="default"
             className="rounded w-8 h-8"
-            onClick={() => handleOpenModal(row.original.id)}
+            onClick={() => openModal('table', row.original.id)}
           >
             *
           </Button>
 
-          <TableModal isOpen={isModalOpen} closeModal={() => setIsModalOpen(false)} purchaseId={selectedId} />
+          {modalType === 'table' && (
+            <TableModal
+              isOpen={true} // Ajusta según sea necesario, deberías controlarlo con el estado
+              closeModal={closeModal}
+              purchaseId={selectedId}
+            />
+          )}
+
+          {modalType === 'alertDelete' && (
+            <AlertDelete
+              isOpenM={true} // Ajusta según sea necesario, deberías controlarlo con el estado
+              closeModalM={closeModal}
+              purchaseId={selectedId}
+            />
+          )}
         </div>
       );
     },
@@ -95,3 +116,5 @@ export const columns: ColumnDef<Purchase>[] = [
     header: () => <span>RUC</span>,
   },
 ];
+
+

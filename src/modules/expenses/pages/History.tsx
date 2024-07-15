@@ -1,7 +1,6 @@
 
 
-import { HistoryTable } from "../ExpenseHistory/TableHistory/HistoryTable";
-import TableModal from "../ExpenseHistory/TableModal/TableModal";
+import { HistoryTable } from "../ExpenseHistory/TableHistory/components/HistoryTable";
 
 export function History() {
   return (
@@ -9,9 +8,7 @@ export function History() {
       <div>
         <br/>
         <p className="text-2xl font-bold ">Historial de Compras</p>
-        {/* <TableHistory /> */}
         <HistoryTable />
-        <TableModal/>
       </div>
     </>
   )
