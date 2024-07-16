@@ -41,6 +41,11 @@ const NotificationProvider = ({ children }: { children: ReactNode }) => {
         setNotifications(prevNotifications => [...prevNotifications, ...notifications]);
         setHasNext(hasNext);
     };
+    
+    const onNotificationsReplaced = (notifications: Notification[], hasNext: boolean) => {
+        setNotifications(notifications);
+        setHasNext(hasNext);
+    }
 
     const {
         createNotification,
@@ -50,7 +55,7 @@ const NotificationProvider = ({ children }: { children: ReactNode }) => {
         updateNotification,
         unarchiveNotification,
         loading,
-    } = useWebSocket({ onNotificationReceived, onNotificationsListReceived, hasNext });
+    } = useWebSocket({ onNotificationReceived, onNotificationsReplaced, onNotificationsListReceived, hasNext });
 
     return (
         <NotificationContext.Provider

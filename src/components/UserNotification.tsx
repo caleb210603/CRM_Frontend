@@ -30,16 +30,16 @@ export default function UserNotification() {
   const markAllAsRead = ()=>{    
     setUnreadCount(0)
   }
-
+  
   //Verificamos si existen notificaciones sin leer, en caso de existir los mostraremos  en la campana
-  useEffect(()=>{
+  useEffect(()=>{    
     const difference = notifications.length - prevNotifications.current.length;    
-
     if(difference > 0) {
       setUnreadCount(difference)
     }
     prevNotifications.current = notifications;
   },[notifications])
+
 
   const handleArchive = (id: number) => {    
     if(!userAuth) return

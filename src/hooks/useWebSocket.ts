@@ -4,10 +4,11 @@ import { Notification, NotificationId, ResponseCreateNotification } from "@/type
 interface UseWebSocketProps {
     onNotificationReceived: (notification: Notification) => void;
     onNotificationsListReceived: (notifications: Notification[], hasNext: boolean) => void;
+    onNotificationsReplaced: (notifications: Notification[], hasNext: boolean) => void;
     hasNext: boolean;
 }
 
-const useWebSocket = ({ onNotificationReceived, hasNext, onNotificationsListReceived }: UseWebSocketProps) => {
+const useWebSocket = ({ onNotificationReceived, onNotificationsReplaced, hasNext, onNotificationsListReceived }: UseWebSocketProps) => {
     const [socket, setSocket] = useState<WebSocket | null>(null);
     const [loading, setLoading] = useState(false);
 
@@ -31,6 +32,12 @@ const useWebSocket = ({ onNotificationReceived, hasNext, onNotificationsListRece
                     date: new Date(notification.date),
                 }));
                 onNotificationsListReceived(notifications, response.has_next);
+            } else if (response.type === 'replace-list') {
+                const notifications = response.notifications.map((notification: Notification) => ({
+                    ...notification,
+                    date: new Date(notification.date),
+                }));
+                onNotificationsReplaced(notifications, response.has_next);
             }
             setLoading(false);
         };
