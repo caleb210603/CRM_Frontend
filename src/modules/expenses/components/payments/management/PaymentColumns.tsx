@@ -34,11 +34,14 @@ const createColumn = (accessorKey: keyof Payment, label: string, sortable: boole
           ? 'bg-green-500 text-white rounded-lg h-6 '
           : cell.getValue() === 'Vencido'
           ? 'bg-red-500 text-white rounded-lg h-6'
-          : 'bg-yellow-500 text-white rounded-lg h-6'
+          : cell.getValue() == 'Pendiente'
+          ? 'bg-yellow-500 text-white rounded-lg h-6'
+          : 'bg-gray-500 text-white rounded-lg h-6'
         : ''}`}>
         {accessorKey === 'date_payment' || accessorKey === 'date_limit'
           ? new Date(cell.getValue() as Date).toLocaleDateString()
           : cell.getValue() as React.ReactNode}
+          
       </div>
     ),
   };
@@ -62,7 +65,7 @@ const createActionsColumn = (): ColumnDef<Payment> => {
        />  
       {/*Funcion para Eliminar pago seleccionado*/ }    
        <DeletePayments
-       id={row.original.id}
+       paymentdata={row.original}
        />
       </div>
     )

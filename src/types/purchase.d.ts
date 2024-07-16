@@ -5,10 +5,10 @@ export interface Purchase {
   date_purchase: Date;
   number_bill: string;
   total: number;
-  status: string;
+  estatus: string;
   created_at?: Date;
   updated_at?: Date;
-  details?: PurchaseDetail[];
+  detailpurchase_id?: PurchaseDetail[];
   provider?: Provider;
   payment?: Payment;
 }
@@ -49,5 +49,6 @@ export interface Payment {
     purchase_obj: Purchase;
     description_obj: string;
     cancelled_total: number;
+    estatus: string;
     estatus: string;
 }
