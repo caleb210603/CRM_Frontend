@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Notification, NotificationId, ResponseCreateNotification } from "@/types/notification";
+import { useAuth } from "./useAuth";
 
 interface UseWebSocketProps {
     onNotificationReceived: (notification: Notification) => void;
@@ -11,9 +12,13 @@ interface UseWebSocketProps {
 const useWebSocket = ({ onNotificationReceived, onNotificationsReplaced, hasNext, onNotificationsListReceived }: UseWebSocketProps) => {
     const [socket, setSocket] = useState<WebSocket | null>(null);
     const [loading, setLoading] = useState(false);
+    const { isAuthenticated } = useAuth();
 
     useEffect(() => {
-        const socketUrl = 'ws://127.0.0.1:8000/ws/notifications/';
+        //Si no esta logeado el usuario no hacemos la conexión con el websocket
+        if (!isAuthenticated) return;
+
+        const socketUrl = import.meta.env.VITE_WEBSOCKET_URL as string;
         const websocket = new WebSocket(socketUrl);
 
         websocket.onopen = () => {
@@ -55,7 +60,7 @@ const useWebSocket = ({ onNotificationReceived, onNotificationsReplaced, hasNext
         return () => {
             websocket.close();
         };
-    }, []);
+    }, [isAuthenticated]);
 
     const createNotification = (notification: ResponseCreateNotification) => {
         if (socket) {
