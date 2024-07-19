@@ -1,4 +1,4 @@
-import { ColumnDef } from "@tanstack/react-table";
+  import { ColumnDef } from "@tanstack/react-table";
 import { User, User as UserDetailType } from "@/types/auth";
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown } from "lucide-react";

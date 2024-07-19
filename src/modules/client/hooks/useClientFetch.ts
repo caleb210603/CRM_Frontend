@@ -1,7 +1,6 @@
 import { ClientDetail } from "@/types/auth";
 import { useInfiniteQuery, useQueryClient } from "react-query";
 import { fetchClients } from "../services/clientService";
-import { setTimeout } from "timers/promises";
 import { useEffect } from "react";
 
 export const useClientsFetch = (search: string | number) => {

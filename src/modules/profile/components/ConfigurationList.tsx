@@ -51,7 +51,7 @@ export const ConfigurationList = () => {
                   onSelect={() => {
                     setstatusButton(item.status);
                   }}
-                  className="flex justify-between"
+                  className="flex justify-between cursor-pointer"
                 >
                   <div className="flex gap-5 items-center hover:text-primary">
                     {icons(item.id)}

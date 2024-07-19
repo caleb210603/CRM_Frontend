@@ -13,6 +13,7 @@ import { useTitle } from "@/hooks/useTitle";
 import { useFetchSaleDetail } from "../hooks/useFetchSaleDetail";
 import { PDFSaleDetailstyles, Watermark } from "../styles/PDFstyles";
 import { getPaymentType } from "@/enums/paymentType";
+import { getCategoryType } from "@/enums/categoryType";
 
 Font.register({
   family: "Helvetica",
@@ -105,20 +106,26 @@ const PDFSaleDetail = () => {
           {/*Encabezados de la tabla */}
           <View style={PDFSaleDetailstyles.table}>
             <View style={PDFSaleDetailstyles.tableRow}>
-              <View style={{ ...PDFSaleDetailstyles.tableColHeader, width: "10%" }}>
+              <View style={{ ...PDFSaleDetailstyles.tableColHeader, width: "8.5%" }}>
                 <Text style={PDFSaleDetailstyles.tableCellHeader}>Item</Text>
               </View>
               <View style={{ ...PDFSaleDetailstyles.tableColHeader, width: "15%" }}>
                 <Text style={PDFSaleDetailstyles.tableCellHeader}>Categoria</Text>
               </View>
-              <View style={{ ...PDFSaleDetailstyles.tableColHeader, width: "12.5%" }}>
+              <View style={{ ...PDFSaleDetailstyles.tableColHeader, width: "10%" }}>
                 <Text style={PDFSaleDetailstyles.tableCellHeader}>Cantidad</Text>
               </View>
-              <View style={{ ...PDFSaleDetailstyles.tableColHeader, width: "37.5%" }}>
+              <View style={{ ...PDFSaleDetailstyles.tableColHeader, width: "30%" }}>
                 <Text style={PDFSaleDetailstyles.tableCellHeader}>Descripción</Text>
               </View>
               <View style={{ ...PDFSaleDetailstyles.tableColHeader, width: "12.5%" }}>
                 <Text style={PDFSaleDetailstyles.tableCellHeader}>Precio Unitario</Text>
+              </View>
+              <View style={{ ...PDFSaleDetailstyles.tableColHeader, width: "12.5%" }}>
+                <Text style={PDFSaleDetailstyles.tableCellHeader}>Descuento</Text>
+              </View>
+              <View style={{ ...PDFSaleDetailstyles.tableColHeader, width: "10%" }}>
+                <Text style={PDFSaleDetailstyles.tableCellHeader}>Tax</Text>
               </View>
               <View style={{ ...PDFSaleDetailstyles.tableColHeader, width: "12.5%" }}>
                 <Text style={PDFSaleDetailstyles.tableCellHeader}>Importe Total</Text>
@@ -128,18 +135,18 @@ const PDFSaleDetail = () => {
             {sales?.flatMap((sale, index) => [
               sale.productData ? (
                 <View style={PDFSaleDetailstyles.tableRow} key={`product-${index}`}>
-                  <View style={{...PDFSaleDetailstyles.tableCol , width: "10%" }}>
+                  <View style={{...PDFSaleDetailstyles.tableCol , width: "8.5%" }}>
                     <Text style={PDFSaleDetailstyles.tableCell}>{index + 1}</Text>
                   </View>
                   <View style={{...PDFSaleDetailstyles.tableCol , width: "15%" }}>
-                    <Text style={PDFSaleDetailstyles.tableCell}>PRODUCTO</Text>
+                    <Text style={PDFSaleDetailstyles.tableCell}>{getCategoryType(sale.productData.product.category)}</Text>
                   </View>
-                  <View style={{...PDFSaleDetailstyles.tableCol , width: "12.5%" }}>
+                  <View style={{...PDFSaleDetailstyles.tableCol , width: "10%" }}>
                     <Text style={PDFSaleDetailstyles.tableCell}>
                       {sale.productData.quantity}
                     </Text>
                   </View>
-                  <View style={{...PDFSaleDetailstyles.tableCol , width: "37.5%" }}>
+                  <View style={{...PDFSaleDetailstyles.tableCol , width: "30%" }}>
                     <Text style={PDFSaleDetailstyles.tableCell}>
                       {`${sale.productData.product.name} (${sale.productData.product.brand}): ${sale.productData.product.description}`}
                     </Text>
@@ -151,6 +158,16 @@ const PDFSaleDetail = () => {
                   </View>
                   <View style={{...PDFSaleDetailstyles.tableCol , width: "12.5%" }}>
                     <Text style={PDFSaleDetailstyles.tableCell}>
+                      {sale.productData.discount}
+                    </Text>
+                  </View>
+                  <View style={{...PDFSaleDetailstyles.tableCol , width: "10%" }}>
+                    <Text style={PDFSaleDetailstyles.tableCell}>
+                      {sale.productData.tax}
+                    </Text>
+                  </View>
+                  <View style={{...PDFSaleDetailstyles.tableCol , width: "12.5%" }}>
+                    <Text style={PDFSaleDetailstyles.tableCell}>
                       {sale.productData.total_item_amount}
                     </Text>
                   </View>
@@ -158,18 +175,18 @@ const PDFSaleDetail = () => {
               ) : null,
               sale.serviceData ? (
                 <View style={PDFSaleDetailstyles.tableRow} key={`service-${index}`}>
-                  <View style={{...PDFSaleDetailstyles.tableCol , width: "10%" }}>
+                  <View style={{...PDFSaleDetailstyles.tableCol , width: "8.5%" }}>
                     <Text style={PDFSaleDetailstyles.tableCell}>{index + 1}</Text>
                   </View>
                   <View style={{...PDFSaleDetailstyles.tableCol , width: "15%" }}>
-                    <Text style={PDFSaleDetailstyles.tableCell}>SERVICIO</Text>
+                    <Text style={PDFSaleDetailstyles.tableCell}>{getCategoryType(sale.serviceData.service.category)}</Text>
                   </View>
-                  <View style={{...PDFSaleDetailstyles.tableCol , width: "12.5%" }}>
+                  <View style={{...PDFSaleDetailstyles.tableCol , width: "10%" }}>
                     <Text style={PDFSaleDetailstyles.tableCell}>
                       {sale.serviceData.quantity}
                     </Text>
                   </View>
-                  <View style={{...PDFSaleDetailstyles.tableCol , width: "37.5%" }}>
+                  <View style={{...PDFSaleDetailstyles.tableCol , width: "30%" }}>
                     <Text style={PDFSaleDetailstyles.tableCell}>
                       {`${sale.serviceData.service.name}: ${sale.serviceData.service.description}`}
                     </Text>
@@ -177,6 +194,16 @@ const PDFSaleDetail = () => {
                   <View style={{...PDFSaleDetailstyles.tableCol , width: "12.5%" }}>
                     <Text style={PDFSaleDetailstyles.tableCell}>
                       {sale.serviceData.unit_price}
+                    </Text>
+                  </View>
+                  <View style={{...PDFSaleDetailstyles.tableCol , width: "12.5%" }}>
+                    <Text style={PDFSaleDetailstyles.tableCell}>
+                      {sale.serviceData.discount}
+                    </Text>
+                  </View>
+                  <View style={{...PDFSaleDetailstyles.tableCol , width: "10%" }}>
+                    <Text style={PDFSaleDetailstyles.tableCell}>
+                      {sale.serviceData.tax}
                     </Text>
                   </View>
                   <View style={{...PDFSaleDetailstyles.tableCol , width: "12.5%" }}>
