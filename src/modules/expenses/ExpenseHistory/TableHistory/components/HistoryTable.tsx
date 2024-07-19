@@ -10,14 +10,15 @@ import CalendaryTable from "./CalendaryTable";
 import { ExportToCSV } from "./exportToCSV";
 import { DateRange } from 'react-day-picker';
 import { useFilteredPurchases } from "./useFilteredPurchases";
-
+import { getStatusCellStyle } from "./CellStyles";
+import PaginationControls from "./PaginationControls";
 
 export function HistoryTable() {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
   const [selectedDateRange, setSelectedDateRange] = React.useState<DateRange | undefined>();
-  const filteredData = useFilteredPurchases(selectedDateRange);
+  const { filteredData, isLoading, isError } = useFilteredPurchases(selectedDateRange);
 
   const table = useReactTable({
     data: filteredData,
@@ -36,17 +37,30 @@ export function HistoryTable() {
     getSortedRowModel: getSortedRowModel(),
   });
 
+  const [currentPage, setCurrentPage] = React.useState(0);
+  const rowsPerPage = 3;
+
+  const paginatedRows = React.useMemo(() => {
+    const startIndex = currentPage * rowsPerPage;
+    const endIndex = startIndex + rowsPerPage;
+    return table.getRowModel().rows.slice(startIndex, endIndex);
+  }, [currentPage, table.getRowModel().rows]);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (isError) {
+    return <div>Error loading data.</div>;
+  }
+
   return (
     <div className="w-full">
       <div>
-
-        {/* CalendaryTable con manejador de cambio */}
         <CalendaryTable onChange={setSelectedDateRange} />
       </div>
 
       <div className="flex items-center py-4">
-
-        {/* INPUT SEARCH */}
         <Input
           placeholder="Filtrar por numero de factura"
           className="max-w-sm"
@@ -55,22 +69,15 @@ export function HistoryTable() {
           }
         />
 
-
         <div className="flex items-center space-x-2 ml-auto">
-          {/* EXPORT TO EXCEL */}
           <ExportToCSV data={filteredData} filename="Historial de compra.csv" />
 
-
-          {/* FILTER COLUMNS */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline">
                 Columns <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-
-
-            {/* LIST COLUMNS */}
             <DropdownMenuContent align="end">
               {table
                 .getAllColumns()
@@ -90,15 +97,13 @@ export function HistoryTable() {
         </div>
       </div>
 
-
-      {/* HEADER TABLE */}
       <div className="rounded-md border text-center">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
+                  <TableHead key={header.id} className="bg-blue-600 text-white font-bold text-center ">
                     {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                   </TableHead>
                 ))}
@@ -106,15 +111,19 @@ export function HistoryTable() {
             ))}
           </TableHeader>
 
-
-          {/* TABLA DATE ENDPOINTS */}
           <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
+            {paginatedRows.length ? (
+              paginatedRows.map((row) => (
                 <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      {cell.column.id === 'estatus' ? (
+                        <div className={`flex items-center justify-center ${getStatusCellStyle(cell.getValue() as string)}`}>
+                          {cell.getValue() as React.ReactNode}
+                        </div>
+                      ) : (
+                        flexRender(cell.column.columnDef.cell, cell.getContext())
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>
@@ -122,42 +131,20 @@ export function HistoryTable() {
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No results.
+                  No hay resultados.
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="flex-1 text-sm text-muted-foreground">
 
-
-          {/* COUNT TABLE */}
-          {table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} row(s) selected.
-        </div>
-        <div className="space-x-2">
-          {/* PREVIOUS AND NEXT */}
-
-
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Anterior
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Siguiente
-          </Button>
-        </div>
-      </div>
+      <PaginationControls
+        currentPage={currentPage}
+        rowsPerPage={rowsPerPage}
+        totalRows={table.getRowModel().rows.length}
+        onPageChange={setCurrentPage}
+      />
     </div>
   );
 }

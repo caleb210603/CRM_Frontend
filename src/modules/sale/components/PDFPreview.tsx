@@ -13,6 +13,7 @@ import { Sale, SaleDetailProduct, SaleDetailService } from "@/types/sale";
 import { useFetchSales } from "../hooks/useFetchSales";
 import { PDFSaleDetailstyles, Watermark } from "../styles/PDFstyles";
 import { getPaymentType } from "@/enums/paymentType";
+import { getCategoryType } from "@/enums/categoryType";
 
 const titlePageStyles = StyleSheet.create({
   page: {
@@ -48,10 +49,10 @@ const PDFPreview = () => {
       {sales.map((sale: Sale, index: number) => {
            const items = [
             ...productData?.filter((p: SaleDetailProduct) => p.sale_obj.saleID === sale.saleID).map((p: SaleDetailProduct) => ({
-              ...p, type: 'Producto', name: p.product.name, brand: p.product.brand, description: p.product.description
+              ...p, type: 'Producto', name: p.product.name, brand: p.product.brand, description: p.product.description, category: p.product.category
             })),
             ...serviceData?.filter((s: SaleDetailService) => s.sale.saleID === sale.saleID).map((s: SaleDetailService) => ({
-              ...s, type: 'Servicio', name: s.service.name, description: s.service.description
+              ...s, type: 'Servicio', name: s.service.name, description: s.service.description, category: s.service.category
             }))
           ];
           return (
@@ -123,7 +124,7 @@ const PDFPreview = () => {
           <View style={PDFSaleDetailstyles.table}>
             <View style={PDFSaleDetailstyles.tableRow}>
               <View
-                style={{ ...PDFSaleDetailstyles.tableColHeader, width: "10%" }}
+                style={{ ...PDFSaleDetailstyles.tableColHeader, width: "8.5%" }}
               >
                 <Text style={PDFSaleDetailstyles.tableCellHeader}>Item</Text>
               </View>
@@ -137,7 +138,7 @@ const PDFPreview = () => {
               <View
                 style={{
                   ...PDFSaleDetailstyles.tableColHeader,
-                  width: "12.5%",
+                  width: "10%",
                 }}
               >
                 <Text style={PDFSaleDetailstyles.tableCellHeader}>
@@ -147,7 +148,7 @@ const PDFPreview = () => {
               <View
                 style={{
                   ...PDFSaleDetailstyles.tableColHeader,
-                  width: "37.5%",
+                  width: "30%",
                 }}
               >
                 <Text style={PDFSaleDetailstyles.tableCellHeader}>
@@ -171,6 +172,26 @@ const PDFPreview = () => {
                 }}
               >
                 <Text style={PDFSaleDetailstyles.tableCellHeader}>
+                  Descuento
+                </Text>
+              </View>
+              <View
+                style={{
+                  ...PDFSaleDetailstyles.tableColHeader,
+                  width: "10%",
+                }}
+              >
+                <Text style={PDFSaleDetailstyles.tableCellHeader}>
+                  Tax
+                </Text>
+              </View>
+              <View
+                style={{
+                  ...PDFSaleDetailstyles.tableColHeader,
+                  width: "12.5%",
+                }}
+              >
+                <Text style={PDFSaleDetailstyles.tableCellHeader}>
                   Importe Total
                 </Text>
               </View>
@@ -182,7 +203,7 @@ const PDFPreview = () => {
                   key={index}
                 >
                   <View
-                    style={{ ...PDFSaleDetailstyles.tableCol, width: "10%" }}
+                    style={{ ...PDFSaleDetailstyles.tableCol, width: "8.5%" }}
                   >
                     <Text style={PDFSaleDetailstyles.tableCell}>
                       {index + 1}
@@ -191,20 +212,20 @@ const PDFPreview = () => {
                   <View
                     style={{ ...PDFSaleDetailstyles.tableCol, width: "15%" }}
                   >
-                    <Text style={PDFSaleDetailstyles.tableCell}>PRODUCTO</Text>
+                    <Text style={PDFSaleDetailstyles.tableCell}>{getCategoryType(item.category)}</Text>
                   </View>
                   <View
-                    style={{ ...PDFSaleDetailstyles.tableCol, width: "12.5%" }}
+                    style={{ ...PDFSaleDetailstyles.tableCol, width: "10%" }}
                   >
                     <Text style={PDFSaleDetailstyles.tableCell}>
                       {item.quantity}
                     </Text>
                   </View>
                   <View
-                    style={{ ...PDFSaleDetailstyles.tableCol, width: "37.5%" }}
+                    style={{ ...PDFSaleDetailstyles.tableCol, width: "30%" }}
                   >
                     <Text style={PDFSaleDetailstyles.tableCell}>
-                      {item.name} {item.brand ? `(${item.brand})` : ''}: {item.description}
+                      {item.name}{item.brand ? `(${item.brand})` : ''}: {item.description}
                     </Text>
                   </View>
                   <View
@@ -212,6 +233,20 @@ const PDFPreview = () => {
                   >
                     <Text style={PDFSaleDetailstyles.tableCell}>
                       {item.unit_price}
+                    </Text>
+                  </View>
+                  <View
+                    style={{ ...PDFSaleDetailstyles.tableCol, width: "12.5%" }}
+                  >
+                    <Text style={PDFSaleDetailstyles.tableCell}>
+                      {item.discount}
+                    </Text>
+                  </View>
+                  <View
+                    style={{ ...PDFSaleDetailstyles.tableCol, width: "10%" }}
+                  >
+                    <Text style={PDFSaleDetailstyles.tableCell}>
+                      {item.tax}
                     </Text>
                   </View>
                   <View
@@ -238,80 +273,6 @@ const PDFPreview = () => {
       })}
       </Document>
     </PDFViewer>
-
-    /*
-    <div className="flex justify-center items-center">
-    <Button onClick={handleGoBack} className="border-2 border-blue-500 rounded p-2 m-2 h-[100px] hover:bg-blue-700 hover:h-[300px] transition-all duration-300">
-      <ArrowLeftToLineIcon className="h-18 w-18 text-white/80"/>
-    </Button>
-    <PDFViewer style={{ width: '100vw', height: '85vh' }}>
-      <Document title="Detalle_Ventas" author="Consigue_Ventas">
-        {sales.map((sale: Sale, index: number) => {
-          const products = productData?.filter((product: SaleDetailProduct) => product.sale_obj.saleID === sale.saleID);
-          const services = serviceData?.filter((service: SaleDetailService) => service.sale.saleID == sale.saleID);
-          return (
-            <Page key={index} size="A4" style={styles.page}>
-              <Watermark/>
-              <View style={{width:'100%'}}>
-              <Image src="/public/crm-logo-noBackground.png" style={watermarkStyle.watermarkImage} />
-              <Text style={styles.header}>INFORME DE VENTA</Text>
-                <View style={styles.container}>
-                  
-                  <Text style={styles.content}>{`Venta número ${sale.saleID}`}</Text>
-                  <Text style={styles.content}>{`Fecha: ${sale.date}`}</Text>
-                  <Text style={styles.content}>{`Cliente: ${sale.customer.name} ${sale.customer.lastname}`}</Text>
-                  <Text style={styles.content}>{`Total: ${sale.total}`}</Text>
-                  <Text style={styles.content}>{`Tipo de pago: ${getPaymentType(sale.paymentType)}`}</Text>
-                </View>
-                <View>
-                  <Text style={styles.headerLeft}>Detalle de Venta:</Text>
-                    <View style={styles.container}>
-                      /*
-                    {products.length > 0 && (
-                      <>
-                      <Text style={styles.headerLeft}>Productos:</Text>
-                      <View style={[styles.horizontalContainer, styles.container]}> 
-                      {products.map((product: SaleDetailProduct, productIndex: number) => (
-                        <View key={productIndex} style={styles.productContainer}>  
-                        <Text style={styles.content}>{`Producto: ${product.product.name}`}</Text>
-                          <Text style={styles.content}>{`Cantidad: ${product.quantity}`}</Text>
-                          <Text style={styles.content}>{`Precio Unitario: S/ ${product.unit_price}`}</Text>
-                          <Text style={styles.content}>{`Descuento: S/ ${product.discount}`}</Text>
-                          <Text style={styles.content}>{`Tax: S/ ${product.tax}`}</Text>
-                          <Text style={styles.content}>{`Importe Total: S/ ${product.total_item_amount}`}</Text>
-                        </View>
-                      ))}
-                      </View>
-                      </>
-                    )}
-
-                      {services.length > 0 && (
-                        <>
-                      <Text style={styles.headerLeft}>Servicios:</Text>
-                      <View style={[styles.horizontalContainer, styles.container]}> 
-                      {services.map((service: SaleDetailService, serviceIndex: number) => (
-                        <View key={serviceIndex} style={styles.productContainer}>
-                          <Text style={styles.content}>{`Servicio: ${service.service.name}`}</Text>
-                          <Text style={styles.content}>{`Cantidad: ${service.quantity}`}</Text>
-                          <Text style={styles.content}>{`Precio Unitario: S/ ${service.unit_price}`}</Text>
-                          <Text style={styles.content}>{`Descuento: S/ ${service.discount}`}</Text>
-                          <Text style={styles.content}>{`Tax: S/ ${service.tax}`}</Text>
-                          <Text style={styles.content}>{`Importe Total: S/ ${service.total_item_amount}`}</Text>
-                        </View> 
-                      ))}
-                      </View>
-                      </>
-                      )}
-                    </View>
-                  </View>
-                </View>
-            </Page>
-          );
-        })}
-      </Document>
-    </PDFViewer>
-  </div>
-  */
   );
 };
 

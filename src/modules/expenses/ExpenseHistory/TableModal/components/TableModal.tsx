@@ -25,10 +25,10 @@ const TableModal: React.FC<TableModalProps> = ({ isOpen, closeModal, purchaseId 
 
         {selectedPurchase ? (
           <div className="grid grid-cols-2 gap-2">
-            <p className="text-sm"><strong>FECHA:</strong> 19/05/03</p>
-            <p className="text-sm"><strong>CLIENTE:</strong> Arnold Campos</p>
-            <p className="text-sm"><strong>MODO DE PAGO:</strong> Trajeta de Credito</p>
-            <p className="text-sm"><strong>FACTURA: XXXX</strong> </p>
+            <p className="text-sm"><strong>FECHA:</strong>2024-06-18</p>
+            <p className="text-sm"><strong>CLIENTE:</strong>####</p>
+            <p className="text-sm"><strong>MODO DE PAGO:</strong>####</p>
+            <p className="text-sm"><strong>FACTURA:</strong>####</p>
           </div>
         ) : (
           <p className="text-sm">No se encontraron detalles para esta compra.</p>

@@ -105,6 +105,7 @@ export function ClientDataTable({
     },
   });
   
+  /*Conversión a Excel*/
   const exportToCSV = () => {
     try {
       const renamedData = data.map(item => {

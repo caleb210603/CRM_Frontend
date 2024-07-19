@@ -6,4 +6,4 @@ import api from "./api";
     return data;
   };
 
-  
+  // api.ts

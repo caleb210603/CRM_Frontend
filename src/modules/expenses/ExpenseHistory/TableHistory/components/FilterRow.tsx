@@ -2,9 +2,10 @@ import { useState } from "react";
 import AlertDelete from "./AlertDelete";
 import { FilterArrow } from "./FilterArrow";
 import { Purchase } from "src/types/purchase";
-import { Button } from "@/components/ui/button";
 import { ColumnDef } from "@tanstack/react-table";
 import TableModal from "../../TableModal/components/TableModal";
+import { FaTimes } from "react-icons/fa";
+import { FaList } from "react-icons/fa6";
 
 export const columns: ColumnDef<Purchase>[] = [
   {
@@ -17,35 +18,39 @@ export const columns: ColumnDef<Purchase>[] = [
     cell: ({ row }) => {
       const [modalType, setModalType] = useState<'table' | 'alertDelete' | null>(null);
       const [selectedId, setSelectedId] = useState<number | null>(null);
+      const [selectedPurchase, setSelectedPurchase] = useState<Purchase | null>(null);
 
-      const openModal = (type: 'table' | 'alertDelete', id: number) => {
-        setSelectedId(id);
+      const openModal = (type: 'table' | 'alertDelete', purchase: Purchase) => {
+        setSelectedId(purchase.id);
+        setSelectedPurchase(purchase);
         setModalType(type);
       };
 
       const closeModal = () => {
         setModalType(null);
         setSelectedId(null);
+        setSelectedPurchase(null);
       };
 
       return (
         <div className="flex justify-center space-x-1">
-          <Button
-            variant="default"
-            className="rounded w-8 h-8 bg-red-600"
-            onClick={() => openModal('alertDelete', row.original.id)}
+         
+          {/* Buttons from Delete and opne Modal  */}
+          <button  
+          className="bg-red-600 text-white rounded p-2 ml-2"
+          onClick={() => openModal('alertDelete', row.original)}
           >
-            x
-          </Button>
-        
+          <FaTimes/>
+         </button>
 
-          <Button
-            variant="default"
-            className="rounded w-8 h-8"
-            onClick={() => openModal('table', row.original.id)}
+
+         <button  
+          className="bg-blue-600 text-white rounded p-2 ml-2"
+          onClick={() => openModal('table', row.original)}
           >
-            *
-          </Button>
+          <FaList/>
+         </button>
+
 
           {modalType === 'table' && (
             <TableModal
@@ -60,6 +65,7 @@ export const columns: ColumnDef<Purchase>[] = [
               isOpenM={true} // Ajusta según sea necesario, deberías controlarlo con el estado
               closeModalM={closeModal}
               purchaseId={selectedId}
+              purchaseData={selectedPurchase}
             />
           )}
         </div>
@@ -87,6 +93,10 @@ export const columns: ColumnDef<Purchase>[] = [
   {
     accessorKey: "total",
     header: () => <span>Total</span>,
+    cell: (info) => {
+      const value = info.getValue();
+      return typeof value === "number" ? value.toFixed(2) : "0.00";
+    },
   },
   {
     accessorKey: "estatus",
@@ -116,5 +126,3 @@ export const columns: ColumnDef<Purchase>[] = [
     header: () => <span>RUC</span>,
   },
 ];
-
-

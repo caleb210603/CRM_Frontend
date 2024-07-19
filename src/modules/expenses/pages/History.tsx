@@ -7,7 +7,8 @@ export function History() {
     <>
       <div>
         <br/>
-        <p className="text-2xl font-bold ">Historial de Compras</p>
+        <h1 className="text-3xl font-extrabold mb-1 mt-3">Historial de Compras</h1>
+       <p className='text-sm text-muted-foreground mb-1'>Administra tu historial de manera eficiente.</p>
         <HistoryTable />
       </div>
     </>
