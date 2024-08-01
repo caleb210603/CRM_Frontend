@@ -54,7 +54,6 @@ export function PurchaseForm({ setIsPending = () => { }, setIsOpen = () => { } }
   const statusOptions: Option[] = [
     { value: "Completado", label: "Completado" },
     { value: "Pendiente", label: "Pendiente" },
-    { value: "Eliminado", label: "Eliminado" },
   ];
 
   const paymentMethodOptions: Option[] = [
