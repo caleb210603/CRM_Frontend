@@ -15,6 +15,7 @@ import Notifications from "./modules/Notifications/Notifications";
 import { useQuery } from "react-query";
 import { User } from "@/types/auth";
 import api from "@/services/api";
+import Analytics from "./modules/Analytics/Analytics";
 
 // Función para obtener el perfil del usuario autenticado (usando la misma interfaz User)
 const getUser = async (): Promise<User> => {
@@ -28,8 +29,7 @@ export default function DashboardPage() {
   const {data: userAuth} = useQuery<User>('user', getUser);
 
   const isAdmin = ()=> {
-    // return userAuth?.is_superuser;
-    return true
+    return userAuth?.role == 1;    
   }
 
   return (
@@ -46,8 +46,10 @@ export default function DashboardPage() {
         </div>
         <Tabs defaultValue="overview" className="space-y-4">
           <TabsList>
-            <TabsTrigger value="overview">Resumen</TabsTrigger>
-            <TabsTrigger value="analytics" disabled>
+            <TabsTrigger value="overview">
+              Resumen
+            </TabsTrigger>
+            <TabsTrigger value="analytics">
               Analítica
             </TabsTrigger>
             <TabsTrigger value="reports" disabled>
@@ -161,6 +163,9 @@ export default function DashboardPage() {
           </TabsContent>          
           <TabsContent value="notifications">
             <Notifications/>              
+          </TabsContent>
+          <TabsContent value="analytics">
+            <Analytics/>   
           </TabsContent>
         </Tabs>
       </div>
