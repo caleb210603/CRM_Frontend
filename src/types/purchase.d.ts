@@ -22,6 +22,21 @@ export interface Purchase {
 }
 
   
+//   id?: number;
+//   description: string;
+//   provider_id: number;
+//   date_purchase: Date;
+//   number_bill: string;
+//   total: number;
+//   estatus: string;
+//   created_at?: Date;
+//   updated_at?: Date;
+//   detailpurchase_id?: PurchaseDetail[];
+//   provider?: Provider;
+//   payment?: Payment;
+// }
+
+
 export interface PurchaseDetail {
     id : number;
     purchase_id: number;
