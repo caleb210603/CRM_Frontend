@@ -93,6 +93,8 @@ export function PurchaseForm({ setIsPending = () => { }, setIsOpen = () => { } }
         purchase_id: purchaseResponse.data.id
       };
 
+      
+
       const paymentResponse = await api.post('payments/create', paymentPayload, {
         headers: {
           'Content-Type': 'application/json'
