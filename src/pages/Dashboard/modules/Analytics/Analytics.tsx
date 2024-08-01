@@ -1,5 +1,5 @@
 import api from "@/services/api";
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { useQuery } from "react-query";
 import { DatePickerWithRange } from "@/components/ui/date-range-picker";
 import { DateRange } from "react-day-picker";
@@ -19,7 +19,7 @@ const Analytics = () => {
     const formatCurrency = (value: number) => `S/ ${value}`;
     const [startDate, setStartDate] = useState<string>();
     const [endDate, setEndDate] = useState<string>();    
-    const { data: totalIncome } = useQuery<DataAnalytics[]>(
+    const { data: totalIncome, isLoading } = useQuery<DataAnalytics[]>(
         ['totalIncome', startDate, endDate],
         () => getData(startDate, endDate), 
         {
@@ -41,35 +41,44 @@ const Analytics = () => {
     }
 
     return (       
-        <div className="">
-            <div className="mb-10">
-                <DatePickerWithRange onChange={handleChange} />
+        <div className="grid grid-rows-2 mt-7 grid-cols-2">
+            <div className="w-full">            
+                <h1 className="mb-6 text-2xl font-bold">Ingresos Totales</h1>
+                <div className="flex flex-wrap gap-4 mb-10">
+                    <DatePickerWithRange className="" onChange={handleChange} />                    
+                </div>
+                <ResponsiveContainer width="100%" height={350} >
+                <BarChart data={totalIncome} barSize={30}>
+                    <XAxis
+                    dataKey="name"
+                    stroke="#888888"
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={true}
+                    />
+                    <YAxis
+                    stroke="#888888"
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={true}
+                    tickFormatter={formatCurrency}
+                    dataKey={'total'}
+                    />            
+                    <Tooltip
+                        // formatter={(value, name) => [value, labelMap[name]]}
+                        labelStyle={{color: "black"}}
+                        contentStyle={{color: 'black'}}
+                        // itemStyle={{ padding: 3, margin: 0 }}
+                    />          
+                    <Bar
+                        dataKey="total"
+                        fill="currentColor"
+                        radius={[4, 4, 0, 0]}
+                        className="fill-primary"                    
+                    />
+                </BarChart>
+                </ResponsiveContainer>                
             </div>
-
-            <ResponsiveContainer width="100%" height={350} >
-            <BarChart data={totalIncome}>
-                <XAxis
-                dataKey="name"
-                stroke="#888888"
-                fontSize={12}
-                tickLine={false}
-                axisLine={false}
-                />
-                <YAxis
-                stroke="#888888"
-                fontSize={12}
-                tickLine={false}
-                axisLine={false}
-                tickFormatter={formatCurrency}
-                />
-                <Bar
-                dataKey="total"
-                fill="currentColor"
-                radius={[4, 4, 0, 0]}
-                className="fill-primary"
-                />
-            </BarChart>
-            </ResponsiveContainer>
         </div>
     );
 };
