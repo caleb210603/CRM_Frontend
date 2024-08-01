@@ -11,14 +11,23 @@ import { ExportToCSV } from "./exportToCSV";
 import { DateRange } from 'react-day-picker';
 import { useFilteredPurchases } from "./useFilteredPurchases";
 import { getStatusCellStyle } from "./CellStyles";
-import PaginationControls from "./PaginationControls";
+import { Calendar } from '@/components/ui/calendar';
 
 export function HistoryTable() {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
   const [selectedDateRange, setSelectedDateRange] = React.useState<DateRange | undefined>();
-  const { filteredData, isLoading, isError } = useFilteredPurchases(selectedDateRange);
+  const [currentPage, setCurrentPage] = React.useState(0);
+  const rowsPerPage = 5;
+
+  const { 
+    filteredData, 
+    isLoading, 
+    isError, 
+    totalPages,
+    totalItems 
+  } = useFilteredPurchases(selectedDateRange, currentPage, rowsPerPage);
 
   const table = useReactTable({
     data: filteredData,
@@ -36,15 +45,6 @@ export function HistoryTable() {
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
   });
-
-  const [currentPage, setCurrentPage] = React.useState(0);
-  const rowsPerPage = 3;
-
-  const paginatedRows = React.useMemo(() => {
-    const startIndex = currentPage * rowsPerPage;
-    const endIndex = startIndex + rowsPerPage;
-    return table.getRowModel().rows.slice(startIndex, endIndex);
-  }, [currentPage, table.getRowModel().rows]);
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -112,8 +112,8 @@ export function HistoryTable() {
           </TableHeader>
 
           <TableBody>
-            {paginatedRows.length ? (
-              paginatedRows.map((row) => (
+            {table.getRowModel().rows.length ? (
+              table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
@@ -139,12 +139,26 @@ export function HistoryTable() {
         </Table>
       </div>
 
-      <PaginationControls
-        currentPage={currentPage}
-        rowsPerPage={rowsPerPage}
-        totalRows={table.getRowModel().rows.length}
-        onPageChange={setCurrentPage}
-      />
+      {/* Controles de paginación */}
+      <div className="flex items-center justify-between mt-4">
+        <div>
+          Mostrando {currentPage * rowsPerPage + 1} - {Math.min((currentPage + 1) * rowsPerPage, totalItems)} de {totalItems}
+        </div>
+        <div className="flex justify-between w-48">
+          <Button 
+            onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
+            disabled={currentPage === 0}
+          >
+            Anterior
+          </Button>
+          <Button
+            onClick={() => setCurrentPage(prev => Math.min(totalPages - 1, prev + 1))}
+            disabled={currentPage === totalPages - 1}
+          >
+            Siguiente
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }

@@ -22,7 +22,13 @@ export const PurchaseSchema = z.object({
     }),
     description: z.string().min(1, requiredErrorMsg),
     number_bill: z.string().min(1, requiredErrorMsg),
-    total: z.coerce.number().min(0, "El total no puede ser negativo"),
+
+    // total: z.coerce.number().min(0, "El total no puede ser negativo"),
+    total: z.number().optional().refine(value => value === undefined || value > 0, {
+        message: "El total no puede ser negativo"
+    }),
+
+
     estatus: z.string().min(1, requiredErrorMsg),
     detailpurchase_id: z.coerce.number().min(1, requiredErrorMsg),
     date_limit: z.string().regex(/^(2024|2025)-\d{2}-\d{2}$/, {
@@ -30,3 +36,4 @@ export const PurchaseSchema = z.object({
     }),
     payment_method: z.string().min(1, requiredErrorMsg)
 });
+

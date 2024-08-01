@@ -10,7 +10,7 @@ export function useFetchProviders() {
     const fetchProviders = async () => {
       try {
         const response = await api.get('/providers');
-        console.log("Response data:", response.data);
+        // console.log("Response data:", response.data);
         setProviders(response.data.results || []);
       } catch (error) {
         console.error("Error fetching providers:", error);

@@ -97,5 +97,3 @@ input.number-to-text::-webkit-inner-spin-button {
 input[type=number].number-to-text {
     -moz-appearance: textfield;
 }
-
-

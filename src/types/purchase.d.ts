@@ -44,6 +44,8 @@ export interface Provider {
     value: string;
     id: number;
     name: string;
+    estatus: string;
+
     ruc: number;
     person_contact: string;
     phone: string;

@@ -9,7 +9,6 @@ import { FaTimes } from "react-icons/fa";
 import { useQueryClient } from "react-query";
 import AlertDialogPayment from "./AlertDialogPayment";
 
-
 interface DeletePaymentsProps {
     paymentdata: Payment
   }

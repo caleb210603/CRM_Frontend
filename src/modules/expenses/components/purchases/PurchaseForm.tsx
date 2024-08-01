@@ -1,3 +1,5 @@
+import React, { useState } from "react";
+import { MultiValue, ActionMeta } from 'react-select';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -12,37 +14,59 @@ import api from "@/services/api";
 import { ToastAction } from "@/components/ui/toast";
 import { PurchaseSchema } from "@/lib/validators/purchase";
 
-const requiredErrorMsg = "Este campo no puede estar vacío";
+interface Option {
+  value: string | number;
+  label: string;
+}
+
+interface MultiOption extends Option { }
 
 interface Props {
   setIsPending?: (value: boolean) => void;
   setIsOpen?: (value: boolean) => void;
 }
 
-export function PurchaseForm({ setIsPending = () => {}, setIsOpen = () => {} }: Props) {
+export function PurchaseForm({ setIsPending = () => { }, setIsOpen = () => { } }: Props) {
   const { providers, error: providersError } = useFetchProviders();
   const { details, error: detailsError } = useFetchDetails();
   const { toast } = useToast();
+
+  const [selectedProvider, setSelectedProvider] = useState<Option | null>(null);
+  const [selectedStatus, setSelectedStatus] = useState<Option | null>(null);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<Option | null>(null);
+  const [selectedDetails, setSelectedDetails] = useState<MultiOption[]>([]);
 
   const form = useForm<z.infer<typeof PurchaseSchema>>({
     resolver: zodResolver(PurchaseSchema),
     defaultValues: {
       provider_id: 0,
-      date_purchase: new Date().toISOString().slice(0, 10), // Default to today's date
+      date_purchase: new Date().toISOString().slice(0, 10),
       description: "",
       number_bill: "",
       total: 0,
       estatus: "",
       detailpurchase_id: 0,
-      date_limit: new Date().toISOString().slice(0, 10), // Default to today's date
+      date_limit: new Date().toISOString().slice(0, 10),
       payment_method: ""
     },
   });
 
-  const providerOptions = providers.map(provider => ({ value: provider.id, label: provider.name }));
-  const detailOptions = details.map(detail => ({ value: detail.id, label: `${detail.item} - ${detail.date_purchase}` }));
+  const statusOptions: Option[] = [
+    { value: "Completado", label: "Completado" },
+    { value: "Pendiente", label: "Pendiente" },
+    { value: "Eliminado", label: "Eliminado" },
+  ];
 
-  const onSubmit = async (data: any) => {
+  const paymentMethodOptions: Option[] = [
+    { value: "Paypal", label: "Paypal" },
+    { value: "Efectivo", label: "Efectivo" },
+    { value: "Credit Card", label: "Credit Card" },
+  ];
+
+  const providerOptions: Option[] = providers.map(provider => ({ value: provider.id, label: provider.name }));
+  const detailOptions: Option[] = details.map(detail => ({ value: detail.id, label: `${detail.item} - ${detail.date_purchase}` }));
+
+  const onSubmit = async (data: z.infer<typeof PurchaseSchema>) => {
     try {
       const purchasePayload = {
         date_purchase: data.date_purchase,
@@ -84,12 +108,28 @@ export function PurchaseForm({ setIsPending = () => {}, setIsOpen = () => {} }: 
         ),
       });
 
+      // reset para restablecer los datos al enviar el form 
+      form.reset({
+        provider_id: 0,
+        date_purchase: new Date().toISOString().slice(0, 10),
+        description: "",
+        number_bill: "",
+        total: 0,
+        estatus: "",
+        detailpurchase_id: 0,
+        date_limit: new Date().toISOString().slice(0, 10),
+        payment_method: ""
+      });
+
+      // Resetear los estados de los Select
+      setSelectedProvider(null);
+      setSelectedStatus(null);
+      setSelectedPaymentMethod(null);
+      setSelectedDetails([]);
+
       setIsOpen(false);
     } catch (error) {
       console.error("Error en la solicitud a la API:", error);
-      if (error) {
-        console.error("Detalles del error:", error);
-      }
       if (error instanceof Error) {
         toast({
           title: "Error",
@@ -118,9 +158,14 @@ export function PurchaseForm({ setIsPending = () => {}, setIsOpen = () => {} }: 
                   <FormLabel>Proveedor</FormLabel>
                   <FormControl>
                     <Select
+                     className="text-black"
+                     placeholder="Selecciona un Proveedor"
                       options={providerOptions}
-                      onChange={(selectedOption) => field.onChange(selectedOption ? selectedOption.value : null)}
-                      defaultValue={providerOptions[0]}
+                      value={selectedProvider}
+                      onChange={(selectedOption: Option | null) => {
+                        setSelectedProvider(selectedOption);
+                        field.onChange(selectedOption ? selectedOption.value : null);
+                      }}
                     />
                   </FormControl>
                   <FormMessage />
@@ -150,10 +195,17 @@ export function PurchaseForm({ setIsPending = () => {}, setIsOpen = () => {} }: 
               control={form.control}
               name="number_bill"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="w-full">
                   <FormLabel>Número de Factura</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input
+                      type="number"
+                      inputMode="decimal"
+                      placeholder="Ingresa número de factura"
+                      {...field}
+                      onChange={(e) => field.onChange(e.target.value)}
+                      className="number-to-text"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -161,6 +213,7 @@ export function PurchaseForm({ setIsPending = () => {}, setIsOpen = () => {} }: 
             />
           </div>
         </div>
+
         <div className="flex justify-between gap-4">
           <div className="w-1/2">
             <FormField
@@ -170,13 +223,25 @@ export function PurchaseForm({ setIsPending = () => {}, setIsOpen = () => {} }: 
                 <FormItem>
                   <FormLabel>Total</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input
+                      type="number"
+                      placeholder="Ingresa el Total"
+                      inputMode="decimal"
+                      {...field}
+                      value={field.value === 0 ? '' : field.value}
+                      onChange={(e) => {
+                        const value = e.target.value === '' ? 0 : parseFloat(e.target.value);
+                        field.onChange(value);
+                      }}
+                      className="number-to-text"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
           </div>
+
           <div className="w-1/2">
             <FormField
               control={form.control}
@@ -185,7 +250,16 @@ export function PurchaseForm({ setIsPending = () => {}, setIsOpen = () => {} }: 
                 <FormItem>
                   <FormLabel>Estado</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Select
+                     className="text-black"
+                      placeholder="Seleccionar un Estado"
+                      options={statusOptions}
+                      value={selectedStatus}
+                      onChange={(selectedOption: Option | null) => {
+                        setSelectedStatus(selectedOption);
+                        field.onChange(selectedOption ? selectedOption.value : '');
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -193,6 +267,7 @@ export function PurchaseForm({ setIsPending = () => {}, setIsOpen = () => {} }: 
             />
           </div>
         </div>
+
         <div className="flex justify-between gap-4">
           <div className="w-1/2">
             <FormField
@@ -202,13 +277,15 @@ export function PurchaseForm({ setIsPending = () => {}, setIsOpen = () => {} }: 
                 <FormItem>
                   <FormLabel>Descripción</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} placeholder="Escribe una descripción..." />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
           </div>
+
+
           <div className="w-1/2">
             <FormField
               control={form.control}
@@ -218,9 +295,18 @@ export function PurchaseForm({ setIsPending = () => {}, setIsOpen = () => {} }: 
                   <FormLabel>IDs de Detalle de Compra</FormLabel>
                   <FormControl>
                     <Select
+                     className="text-black"
+                      placeholder="Selecciona una Compra"
                       options={detailOptions}
                       isMulti
-                      onChange={(selectedOptions) => field.onChange(selectedOptions.map(option => option.value))}
+                      value={selectedDetails}
+                      onChange={(
+                        newValue: MultiValue<MultiOption>,
+                        actionMeta: ActionMeta<MultiOption>
+                      ) => {
+                        setSelectedDetails(newValue as MultiOption[]);
+                        field.onChange(newValue.map(option => option.value));
+                      }}
                     />
                   </FormControl>
                   <FormMessage />
@@ -229,6 +315,7 @@ export function PurchaseForm({ setIsPending = () => {}, setIsOpen = () => {} }: 
             />
           </div>
         </div>
+
         <div className="flex justify-between gap-4">
           <div className="w-1/2">
             <FormField
@@ -253,7 +340,16 @@ export function PurchaseForm({ setIsPending = () => {}, setIsOpen = () => {} }: 
                 <FormItem>
                   <FormLabel>Método de Pago</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Select
+                    className="text-black"
+                      placeholder="Selecciona un Metodo de Pago"
+                      options={paymentMethodOptions}
+                      value={selectedPaymentMethod}
+                      onChange={(selectedOption: Option | null) => {
+                        setSelectedPaymentMethod(selectedOption);
+                        field.onChange(selectedOption ? selectedOption.value : '');
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
