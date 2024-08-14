@@ -11,11 +11,19 @@ import { DatePickerWithRange } from "@/components/ui/date-range-picker";
 import { Overview } from "@/components/Overview";
 import { RecentSales } from "@/modules/analytics/components/RecentSales";
 import { useTitle } from "@/hooks/useTitle";
+import { SoldProducts } from "@/modules/analytics/components/SoldProducts";
+import { useState } from "react";
+import { SoldServices } from "@/modules/analytics/components/SoldServices";
+import { useSales } from "@/modules/analytics/hooks/useSales";
 
 export default function DashboardPage() {
   useTitle("Panel de control");
+
+  const { isLoading, sales, totalSales } = useSales();
+
+  const [isActive, setisActive] = useState<boolean>(true);
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col mb-5">
       <div className="flex-1 space-y-4">
         <div className="flex items-center justify-between space-y-2">
           <h2 className="text-4xl font-extrabold leading-tight tracking-tight">
@@ -60,7 +68,7 @@ export default function DashboardPage() {
                   </svg>
                 </CardHeader>
                 <CardContent className="text-center">
-                  <div className="text-2xl font-bold">S/.45,231.89</div>
+                  <div className="text-2xl font-bold">S/.{totalSales}</div>
                   <p className="text-xs text-muted-foreground">
                     +20.1% respecto al mes pasado
                   </p>
@@ -116,7 +124,7 @@ export default function DashboardPage() {
                 </CardContent>
               </Card>
             </div>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+            {/* <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
               <Card className="col-span-4">
                 <CardHeader>
                   <CardTitle>Resumen</CardTitle>
@@ -136,7 +144,19 @@ export default function DashboardPage() {
                   <RecentSales />
                 </CardContent>
               </Card>
-            </div>
+            </div> */}
+            <Card className="rounded-lg shadow-lg p-4 transform transition-transform hover:scale-[1.01]">
+              <CardHeader>
+                <CardTitle>Resumen de ventas</CardTitle>
+              </CardHeader>
+              <CardContent className="pl-2">
+                {isActive ? (
+                  <SoldProducts setIsActive={setisActive} />
+                ) : (
+                  <SoldServices setIsActive={setisActive} />
+                )}
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </div>
