@@ -6,7 +6,7 @@ export type Product = {
   stock: number;
   stock_security?: number;
   barcode?: string;
-  status?: number;
+  status?: ProductStatusEnums;
   created_at?: Date;
   updated_at?: Date;
   category: number;
@@ -15,3 +15,10 @@ export type Product = {
   rating:string;
 
 };
+
+
+export enum ProductStatusEnums{
+  disponible = 0,
+  agotado = 1,
+  descatalogado = 2
+}

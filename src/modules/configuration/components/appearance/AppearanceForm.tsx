@@ -18,12 +18,15 @@ import {
 } from "@/components/ui/form";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "@/hooks/useToast";
+import { useFont } from "@/contexts/font";
+import { useTheme } from "@/contexts/theme";
+
 
 const appearanceFormSchema = z.object({
   theme: z.enum(["light", "dark"], {
     required_error: "Please select a theme.",
   }),
-  font: z.enum(["inter", "manrope", "system"], {
+  font: z.enum(["inter", "lato", "roboto"], {
     invalid_type_error: "Select a font",
     required_error: "Please select a font.",
   }),
@@ -31,9 +34,19 @@ const appearanceFormSchema = z.object({
 
 type AppearanceFormValues = z.infer<typeof appearanceFormSchema>;
 
-// This can come from your database or API.
+type theme = "dark" | "light"
+type font = "inter" | "lato" |  "roboto"
+
+
+const storedTheme= localStorage.getItem("vite-ui-theme") 
+const storedFont = localStorage.getItem("vite-ui-font")  
+
+const defaultTheme:theme = (storedTheme === null || storedTheme === undefined) ? "dark" : storedTheme as theme;
+const defaultFont = (storedFont === null || storedFont === undefined) ? "inter" : storedFont as font;
+
 const defaultValues: Partial<AppearanceFormValues> = {
-  theme: "light",
+  theme: defaultTheme,
+  font: defaultFont,
 };
 
 export function AppearanceForm() {
@@ -42,7 +55,14 @@ export function AppearanceForm() {
     defaultValues,
   });
 
+  const { setFont } = useFont()
+  const { setTheme } = useTheme()
+
   function onSubmit(data: AppearanceFormValues) {
+    console.log({ data });
+    setFont(data.font);
+    setTheme(data.theme)
+
     toast({
       title: "You submitted the following values:",
       description: (
@@ -72,8 +92,8 @@ export function AppearanceForm() {
                     {...field}
                   >
                     <option value="inter">Inter</option>
-                    <option value="manrope">Manrope</option>
-                    <option value="system">System</option>
+                    <option value="lato">Lato</option>
+                    <option value="roboto">roboto</option>
                   </select>
                 </FormControl>
                 <ChevronDownIcon className="absolute right-3 top-2.5 h-4 w-4 opacity-50" />

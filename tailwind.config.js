@@ -81,6 +81,11 @@ module.exports = {
         25: '.25',
         75: '.75',
         175: '1.75',
+      },
+      fontFamily:{
+        'inter': 'var(--Inter)',
+        'roboto': 'var(--Roboto)',
+        'lato': 'var(--Lato)'
       }
     },
   },

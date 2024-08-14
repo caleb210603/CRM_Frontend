@@ -12,9 +12,8 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import { Skeleton } from "@/components/ui/skeleton"
 import { ProductDialog } from "../components/ProductDialog";
 import { SERVICE, PRODUCT } from '../config'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import AddService from "../components/AddService";
-import { ServiceCard } from "../components/ServiceCard";
 import { Service } from "@/types/service";
 import { ServiceDialog } from "../components/ServiceDialog";
 
@@ -23,7 +22,7 @@ import { ServiceDialog } from "../components/ServiceDialog";
 export type DisplayType = "gridView" | "detailedView" | "listView";
 
 interface ProductCardsProps {
-  itemsInventory: Product[] | Service[];
+  itemsInventory: (Product | Service)[];
   activeType: DisplayType;
   activeTab: string;
 }
@@ -41,7 +40,7 @@ interface ViewButtonProps {
 
 const layoutClasses = {
   gridView:
-    "grid 2xl:grid-cols-5 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1",
+    "grid 2xl:grid-cols-4 xl:grid-cols-3 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1",
   detailedView: "grid 2xl:grid-cols-3 lg:grid-cols-2 sm:grid-cols-1",
   listView: "grid grid-cols-1 gap-4",
 };
@@ -107,19 +106,32 @@ function ProductSkeleton({ activeType }: ProductSkeletonProps) {
   ));
 }
 
+type ItemsInventory = Product | Service
+
+interface PropFilters {
+  categoryIds: number[]
+  minValue: number
+  maxValue: number
+  max: number
+}
+
+const InitialStateFilters = {
+  categoryIds: [],
+  minValue: 0,
+  maxValue: 1000,
+  max: 1000
+}
 
 
 
 export function Inventory() {
   const [activeType, setActiveType] = useState<DisplayType>("gridView");
   const [display, setDisplay] = useState(layoutClasses.gridView);
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [filtersItems, setFiltersItems] = useState<PropFilters>(InitialStateFilters);
   const [search, setSearch] = useState("");
   const [activeTab, setActiveTab] = useState(PRODUCT)
 
-  const handleFilter = (filtered: Product[]) => {
-    setFilteredProducts(filtered);
-  };
+
 
   const showCardsOfType = (type: DisplayType) => {
     setActiveType(type);
@@ -145,33 +157,68 @@ export function Inventory() {
   );
 
 
+
+
   /* itemsInventory */
-  const itemsInventory =
+  const itemsInventory: ItemsInventory[] =
     data?.pages.reduce(
       (prevProducts, page) => prevProducts.concat(page.data),
       []
     ) ?? [];
 
+
+  const getItemsFiltered = () => {
+    let filtered = itemsInventory;
+
+    if (Array.isArray(filtered)) {
+
+      if (filtersItems.categoryIds.length !== 0) {
+        filtered = itemsInventory.filter(item => filtersItems.categoryIds.includes(item.category));
+      }
+
+      if ((filtersItems.maxValue !== 1000 || filtersItems.minValue !== 0)) {
+        filtered = filtered.filter((item) => {
+          if (isProduct(item)) {
+            return item.price >= filtersItems.minValue && item.price <= filtersItems.maxValue
+          }
+        });
+      }
+    }
+    return filtered;
+  };
+
+  const itemsFiltered = getItemsFiltered()
+
+  /* TabTriggres function */
+  const changeToService = () => { console.log("servicio"); setActiveTab(SERVICE); setFiltersItems(InitialStateFilters) }
+  const changeToProduct = () => { console.log("producto"); setActiveTab(PRODUCT); setFiltersItems(InitialStateFilters) }
+
   return (
     <>
       <div className="2xl:flex justify-between mb-8 gap-4">
-        <div className="flex justify-between xl:justify-start xl:gap-4">
-          <Search icon={"Search"} setSearch={setSearch} />
-          {activeTab == PRODUCT ? <AddProduct /> : <AddService />}
+        <div className="flex justify-between 2xl:justify-start xl:gap-4">
+          <div className="flex gap-4">
+            <Search icon={"Search"} setSearch={setSearch} />
+            {activeTab == PRODUCT ? <AddProduct /> : <AddService />}
+
+          </div>
+          <Tabs defaultValue={PRODUCT} className="">
+            <TabsList>
+              <TabsTrigger value={PRODUCT} onClick={changeToProduct}>Producto</TabsTrigger>
+              <TabsTrigger value={SERVICE} onClick={changeToService}>Servicio</TabsTrigger>
+            </TabsList>
+          </Tabs>
 
         </div>
-        <Tabs defaultValue={PRODUCT} className="w-[400px]">
-          <TabsList>
-            <TabsTrigger value={PRODUCT} onClick={() => { console.log("entro"); return setActiveTab(PRODUCT) }}>Producto</TabsTrigger>
-            <TabsTrigger value={SERVICE} onClick={() => setActiveTab(SERVICE)}>Servicio</TabsTrigger>
-          </TabsList>
-        </Tabs>
 
         <div className="flex flex-col 2xl:flex-row gap-5">
+
           <FilterInventory
-            onFilter={handleFilter}
-            products={filteredProducts}
+            onFilter={setFiltersItems}
+            filter={filtersItems}
+            activeTab={activeTab}
           />
+
           <div className="flex">
             <ViewButton
               viewType="gridView"
@@ -209,7 +256,7 @@ export function Inventory() {
         {
           !isLoading && itemsInventory.length > 0 &&
           <div className={cn("gap-4 pb-5", display)}>
-            <ItemsCards itemsInventory={itemsInventory} activeType={activeType} activeTab={activeTab} />
+            <ItemsCards itemsInventory={itemsFiltered} activeType={activeType} activeTab={activeTab} />
           </div>
         }
         {

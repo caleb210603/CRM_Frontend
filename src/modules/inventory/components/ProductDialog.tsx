@@ -86,8 +86,12 @@ export const ProductDialog: React.FC<ProductCardProps> = ({
             )}
             Actualizar
           </Button>
+
         </DialogFooter>
       </DialogContent>
     </Dialog>
   );
 };
+
+
+

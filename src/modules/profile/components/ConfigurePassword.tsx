@@ -18,20 +18,20 @@ interface Props {
 
 const changePasswordSchema = z.object({
     password: LoginSchema.shape.password,
-    passwordNew: PasswordChangeSchema.shape.password,
+    passwordNew: PasswordChangeSchema.shape.passwordConfirm,
     passwordConfirm: PasswordChangeSchema.shape.password,
 }).refine((data) => data.password !== data.passwordNew, {
-    message: "New password cannot be the same as the old one",
+    message: "La nueva contraseña no puede ser igual a la actual",
     path: ["passwordNew"],
 }).refine((data) => data.passwordNew === data.passwordConfirm, {
-    message: "Passwords do not match",
+    message: "No coinciden las Contraseñas",
     path: ["passwordConfirm"],
 })
 
 type Inputs = z.infer<typeof changePasswordSchema>
 
 
-const ConfigurePassword = ({ setstatusButton }: Props) => {
+const ConfigurePassword = ({ setstatusButton}: Props) => {
     const [isLoading, setIsLoading] = useState(false)
 
     const dispatch = useDispatch()
@@ -49,24 +49,31 @@ const ConfigurePassword = ({ setstatusButton }: Props) => {
         const data = { old_password: value.password, new_password: value.passwordConfirm }
         try {
 
-            const response = await api.put("change-password", data)
+            const response = await api.put("auth/changepassword", data)
             if (response.status === 200) {
                 toast({
                     title: `${response.data.message}`,
                 });
+            dispatch(logout())
+            } else {
+                throw new Error(`La solicitud falló con el código de estado ${response.status}`);
             }
 
-            dispatch(logout())
 
         } catch (error: any) {
+            if (error.response && error.response.data && error.response.data.error) {
+            console.error("Error message from server:", error.response.data.error);
             toast({
-                title: "Error al actualizar contraseña",
+                title: error.response.data.error,
                 variant: "destructive",
             });
+        }
+
         } finally {
             setIsLoading(false)
         }
     }
+
 
     return (
         <div className="flex flex-col gap-3 max-w-md">
@@ -79,8 +86,8 @@ const ConfigurePassword = ({ setstatusButton }: Props) => {
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubtmit)} className="grid gap-4">
                     <InputPassword form={form} name="password" placeholder="Contraseña actual" />
-                    <InputPassword form={form} name="passwordNew" placeholder="Nueva contraseña" />
-                    <InputPassword form={form} name="passwordConfirm" placeholder="Confirma nueva contraseña " />
+                    <InputPassword form={form} name="passwordNew" placeholder="Contraseña nueva" />
+                    <InputPassword form={form} name="passwordConfirm" placeholder="Repetir contraseña nueva" />
                     <div className="justify-end flex">
                         <Button disabled={isLoading} type="submit" className="px-5 ">
                             {isLoading && (

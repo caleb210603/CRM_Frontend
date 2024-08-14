@@ -21,19 +21,22 @@ import { Badge } from "./badge";
 type ComboboxMultiProps = {
   onSelectCategory: (selectedCategories: string[]) => void;
   categorias: CategoriaDetail[];
+  selectedCategories: CategoriaDetail[];
 };
 export function ComboboxMulti({
   onSelectCategory,
   categorias,
+  selectedCategories
 }: ComboboxMultiProps) {
   const [open, setOpen] = React.useState(false);
-  const [values, setValues] = React.useState<string[]>([]);
+  const [values, setValues] = React.useState<string[]>(selectedCategories.map(item => item.name.toLocaleLowerCase()));
 
   const handleSelect = (selectedValue: string) => {
     const newValue = [...values];
     const index = newValue.indexOf(selectedValue);
+
     if (index === -1) {
-      newValue.push(selectedValue);
+      newValue.push(selectedValue.toLocaleLowerCase());
     } else {
       newValue.splice(index, 1);
     }
@@ -46,10 +49,11 @@ export function ComboboxMulti({
   };
 
   const selectedLabels = values.map(
-    (value) =>
-      categorias.find((categoria) => categoria.name === value)?.name || ""
+    (value) => {
+      return categorias.find((categoria) => categoria.name.toLowerCase() === value.toLocaleLowerCase())?.name || ""
+    }
   );
-  
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -82,7 +86,7 @@ export function ComboboxMulti({
                 <Check
                   className={cn(
                     "mr-2 h-4 w-4",
-                    values.includes(categoria.name)
+                    values.includes(categoria.name.toLocaleLowerCase())
                       ? "opacity-100"
                       : "opacity-0"
                   )}

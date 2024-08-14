@@ -28,9 +28,8 @@ export function ProductCard({
   imageClasses,
 }: ProductCardProps) {
 
-  console.log(product)
   return (
-    <Card className={cn("rounded-xl overflow-hidden", className)}>
+    <Card className={cn("rounded-xl overflow-hidden h-full", className)}>
       <CardHeader
         className={cn(
           "text-start w-full",
@@ -44,7 +43,7 @@ export function ProductCard({
             activeType === "listView" && "flex items-center gap-5"
           )}
         >
-          {"S/. " + product.price}
+          {"S/. " + product.price} <br />
           {CategoriaDetail && (
             <Badge className={`${categoryColors[CategoriaDetail.color]}`}>
               {CategoriaDetail.name}
@@ -77,5 +76,5 @@ export function ProductCard({
         </div>
       </CardContent>
     </Card>
-  );
+  );                   
 }

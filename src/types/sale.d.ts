@@ -1,51 +1,56 @@
-export type Sale = {
-    id: number;
-    customer_id: number;
-    user_id: number;
-    sale_date: string;
-    sale_status: SaleStatus;
-    payment_method: PaymentMethod;
-    total_amount: number;
-    note?: string;
-    created_at: Date; 
-    updated_at: Date; 
-    items: (ProductSaleItem | ServiceSaleItem)[]; 
+import { ClientDetail } from "./auth";
+import { Product } from "./product";
+import { Service } from "./service";
+import { Phone } from 'lucide-react';
+
+export interface Sale{
+    items: any;
+    saleID: number;
+    cliente: string;
+    name: string;
+    lastname: string;
+    email: string;
+    phone: number;
+    date: string;
+    total: string;
+    paymentType: number;
+    saleStatus: number;
+    customer: ClientDetail;
+    created_at: string;
+    updated_at: string;
 }
 
-export enum SaleStatus {
-    COMPLETED = "COMPLETED",
-    PENDING = "PENDING",
-    INPROGRESS = "IN PROGRESS",
-    
-  }
-  
-export enum PaymentMethod {
-    CASH = "CASH",
-    CARD = "CARD",
-    OTHER = "OTHER", 
-   
+export interface TableCellWithBadgeProps {
+    saleStatus: number;
   }
 
-export type ProductSaleItem = {
+
+export interface SaleDetail {
+    sales: Sale
+    serviceData: SaleDetailService | null;
+    productData: SaleDetailProduct | null;
+}
+
+export interface SaleDetailProduct {
     id: number;
-    sale_id: number;
-    product_id: number;
     quantity: number;
     unit_price: number;
     discount: number;
     tax: number;
     total_item_amount: number;
-    created_at: Date; 
+    created_at: string;
+    sale_obj: Sale;
+    product: Product;
 }
 
-export type ServiceSaleItem = {
+export interface SaleDetailService {
     id: number;
-    sale_id: number;
-    service_id: number;
     quantity: number;
     unit_price: number;
     discount: number;
     tax: number;
     total_item_amount: number;
-    created_at: Date; 
+    created_at: string;
+    sale: Sale;
+    service: Service;
 }

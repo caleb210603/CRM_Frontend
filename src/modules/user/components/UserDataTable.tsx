@@ -17,7 +17,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { useState } from "react";
+import React, { useState } from "react";
 import { columns } from "@/modules/user/components/management/Columns";
 import {
   DropdownMenu,
@@ -32,6 +32,10 @@ import { User } from "@/types/auth";
 import { DebouncedInput } from "@/components/DebounceInput";
 import { fuzzyFilter } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
+import Papa from "papaparse";
+import { getDocumentType } from "@/enums/documentType";
+import { getRole } from "@/enums/role";
+import { Head } from "react-day-picker";
 
 interface Props {
   data: User[];
@@ -48,12 +52,17 @@ const columnLabels: { [key: string]: string } = {
   image: "image"
 };
 
+
+
 export function UserDataTable({ data, isLoading }: Props) {
+  /*Sacamos el rol del usuario que ha iniciado sesión*/
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
   const [globalFilter, setGlobalFilter] = useState("");
+
+
 
   const table = useReactTable({
     data,
@@ -85,6 +94,40 @@ export function UserDataTable({ data, isLoading }: Props) {
     },
   });
 
+  const exportToCSV = () => {
+    try {
+      const renamedData = data.map(item => {
+        const documentType = getDocumentType(item.document_type);
+        const role = getRole(item.role);
+        return {
+          id: item.id,
+          NombreDeUsuario: item.username,
+          Correo: item.email,
+          Nombre: item.name,
+          Apellido: item.lastname,
+          Documento: documentType,
+          Número: item.document_number,
+          Teléfono: item.phone,
+          Dirección: item.address,
+          Rol: role,
+          Estado: item.is_active? "Activo" : "Inactivo",
+        };
+      });
+      const csvData = Papa.unparse(renamedData, {
+        delimiter: ";"
+      });
+      const BOM = "\uFEFF"; 
+      const csvBlob = new Blob([BOM + csvData], { type: 'text/csv;charset=utf-8;' }); 
+      const url = URL.createObjectURL(csvBlob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', 'users.csv');
+      link.click();
+    } catch (error) {
+      console.error("Error exporting CSV: ", error);
+    }
+  };
+
   return (
     <div className="w-full">
       <div className="flex items-center py-4">
@@ -100,18 +143,31 @@ export function UserDataTable({ data, isLoading }: Props) {
               Columnas <ChevronDown className="ml-2 h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
+
+
+          <Button onClick={exportToCSV} className="bg-green-500 hover:bg-green-600 ml-2">Exportar CSV</Button>
+
           <DropdownMenuContent align="end">
             {table
               .getAllColumns()
               .filter((column) => column.getCanHide())
               .map((column) => {
+                // Define los nombres de las columnas que no deben cambiar su estado de check
+                const nonToggleableColumns = ["name", "lastname"];
+
                 return (
                   <DropdownMenuCheckboxItem
                     key={column.id}
                     className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
+                    // Verifica si la columna actual está en la lista de columnas no cambiables
+                    checked={
+                      nonToggleableColumns.includes(column.id) || column.getIsVisible()
+                    }
+                    // Si es una columna no cambiable, no permitas cambios de check
+                    onCheckedChange={
+                      nonToggleableColumns.includes(column.id)
+                        ? () => { }
+                        : (value) => column.toggleVisibility(!!value)
                     }
                   >
                     {columnLabels[column.id] || column.id}
@@ -119,6 +175,8 @@ export function UserDataTable({ data, isLoading }: Props) {
                 );
               })}
           </DropdownMenuContent>
+
+
         </DropdownMenu>
       </div>
       <div className="rounded-md border">
@@ -135,9 +193,9 @@ export function UserDataTable({ data, isLoading }: Props) {
                         {header.isPlaceholder
                           ? null
                           : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
                       </TableHead>
                     );
                   })}

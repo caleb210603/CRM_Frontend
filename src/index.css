@@ -1,4 +1,5 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -25,6 +26,9 @@
     --destructive-foreground: 3 0% 100%;
     --ring: 229 100% 62%;
     --radius: 0.5rem;
+    --Inter:"Inter";
+    --Roboto:"Roboto";
+    --Lato:"Lato";
   }
 
   .dark {
@@ -64,4 +68,32 @@ html {
     @apply bg-background text-foreground;
     font-family: "Inter", sans-serif;
   }
+}
+
+@layer components {
+  .grid-content {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(350px,1fr));    
+  }
+
+  .scrollbar-hidden {
+    scrollbar-width: none; /* Para Firefox */
+    -ms-overflow-style: none; /* Para IE y Edge */
+  }
+
+  .scrollbar-hidden::-webkit-scrollbar {
+      display: none; /* Para Chrome, Safari y Opera */
+  }
+}
+
+/* hide increment/decrement  */
+input.number-to-text::-webkit-outer-spin-button,
+input.number-to-text::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type=number].number-to-text {
+    -moz-appearance: textfield;
 }

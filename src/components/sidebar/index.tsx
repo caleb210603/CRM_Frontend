@@ -26,7 +26,7 @@ export function Sidebar({ isExpanded, btnUpdateMenuVisibility }: NavbarProps) {
             <TooltipTrigger
               asChild
               onClick={btnUpdateMenuVisibility}
-              className="absolute top-[40rem] xl:top-[50rem] h-10 -right-[1.7rem]"
+              className="absolute top-[40rem] xl:top-[45rem] h-10 -right-[1.7rem]"
             >
               <Button variant="outline" className="z-50">
                 <ArrowRightLeft className="w-4" />

@@ -14,9 +14,9 @@ export const createClient = async (values: any) => {
   }
 };
 
-export const updateClient = async (clientId: string, values: any) => {
+export const updateClient = async (clientId: number, values: any) => {
   try {
-    const { status } = await api.patch(`/clients/update/${clientId}`, values);
+    const { status } = await api.put(`/clients/update/${clientId}`, values);
     if (status === 200) {
       toast({ title: "Cliente editado" });
     } else {

@@ -113,7 +113,7 @@ export const columns: ColumnDef<CategoriaDetailType>[] = [
     cell: ({ row }) => {
       const selectedType = row.getValue("type_category");
       return (
-        <div className="content-center">
+        <div className="flex-items-center">
           {selectedType === 0 ? (
             <>
               <ShoppingCart />

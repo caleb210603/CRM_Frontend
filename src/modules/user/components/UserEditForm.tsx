@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { string, z } from "zod";
+import {  z } from "zod";
 import {
   Select,
   SelectContent,
@@ -30,9 +30,10 @@ interface Props {
   form: any;
   setIsOpen: (value: boolean) => void
   file: File | null;
+  setFile: (file: File | null) => void;
 }
 
-export function UserEditForm({ edit, user, setIsPending, form, setIsOpen, file }: Props) {
+export function UserEditForm({ edit, user, setIsPending, form, setIsOpen, file, setFile }: Props) {
   const queryClient = useQueryClient();
   const onSubmit = async (values: z.infer<typeof UserSchema>) => {
     setIsPending(true);
@@ -47,10 +48,11 @@ export function UserEditForm({ edit, user, setIsPending, form, setIsOpen, file }
         ImageUpdate();
       } 
 
-      const { status } = await api.patch(`/users/update/${user?.id}`, updatedUserData);
+      const { status } = await api.put(`/users/update/${user?.id}`, updatedUserData);
       status  === 200
         ? toast({ title: "Usuario editado" })
         : toast({ title: "Error al editar", variant: "destructive" });
+        setFile(null)
       queryClient.invalidateQueries("users");
       setIsOpen(false)
     } catch (error) {
@@ -86,6 +88,7 @@ const ImageUpdate = async () => {
       console.error("Error al actualizar cuenta:", error);
     } 
   };
+
 
   return (
     <ScrollArea className="h-[500px] w-[460px]">

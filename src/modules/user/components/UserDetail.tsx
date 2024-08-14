@@ -20,6 +20,7 @@ import { UserSchema } from "@/lib/validators/user";
 import { useQueryClient } from "react-query";
 import Dropzone from "react-dropzone";
 
+
 interface Props {
   user: UserDetailType;
   open: boolean;
@@ -30,10 +31,10 @@ export function UserDetail({ user, open, setIsOpen }: Props) {
   const [edit, setEdit] = useState(true);
   const [isPending, setIsPending] = useState(false);
   const queryClient = useQueryClient();
-  const [isAdmin, setIsAdmin] = useState<number | null>();
   const [file, setFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState("");
   const [imageUrl, setImageUrl] = useState<string>("");
+
 
   const handleCancelUpdate = () => {
     setEdit(true);
@@ -63,12 +64,6 @@ export function UserDetail({ user, open, setIsOpen }: Props) {
       image: user?.image || "",
     },
   });
-
-  useEffect(() => {
-    if (user && typeof user.role === "number") {
-      setIsAdmin(user.role === 1 ? 1 : 2);
-    }
-  }, [user]);
 
   const handleUpdateUser = async (user: User) => {
     setIsPending(true);
@@ -145,7 +140,7 @@ export function UserDetail({ user, open, setIsOpen }: Props) {
               {({ getRootProps, getInputProps }) => (
                 <div
                   {...getRootProps()}
-                  className="w-48 h-48 mx-auto rounded-full flex-initial object-cover cursor-pointer"
+                  className="w-50 h-50 mx-auto rounded-full flex-initial object-cover cursor-pointer"
                 >
                   <input {...getInputProps()} />
                   <div className="group h-full w-full relative transition-colors duration-300 bg-background rounded-full text-center flex justify-center items-center overflow-hidden border-dashed hover:border-solid border-2 border-accent hover:border-primary">
@@ -161,16 +156,13 @@ export function UserDetail({ user, open, setIsOpen }: Props) {
                         alt="Imagen de perfil"
                         className="rounded-full w-48 h-48 object-cover"
                       />
-                    ) : user.image && typeof user.image === "string" ? (
-                      <img
-                        src={user.image}
-                        alt="Imagen de perfil"
-                        className="rounded-full w-48 h-48 object-cover"
-                      />
                     ) : (
-                      <AvatarFallback className="text-3xl">
-                        {getInitials(user.name, user.lastname)}
-                      </AvatarFallback>
+                      <Avatar className="mx-auto rounded-full w-48 h-48 flex-initial object-cover">
+                        <AvatarImage src={typeof user.image === 'string' ? user.image : undefined} alt="image profile user" className="object-cover"/>
+                         <AvatarFallback className="text-3xl">
+                          {getInitials(user.name, user.lastname)}
+                         </AvatarFallback>
+                      </Avatar>
                     )}
                   </div>
                 </div>
@@ -184,18 +176,11 @@ export function UserDetail({ user, open, setIsOpen }: Props) {
          </div>
           {edit && (
             <Avatar className="mx-auto rounded-full w-48 h-48 flex-initial object-cover">
-              {user.image && typeof user.image === "string" ? (
-                <AvatarImage
-                  src={user.image}
-                  alt="Imagen de perfil"
-                  className="rounded-full w-48 h-48 object-cover"
-                />
-              ) : (
-                <AvatarFallback className="text-3xl">
-                  {getInitials(user.name, user.lastname)}
-                </AvatarFallback>
-              )}
-            </Avatar>
+            <AvatarImage src={typeof user.image === 'string' ? user.image : undefined} alt="image profile user" className="object-cover"/>
+            <AvatarFallback className="text-3xl">
+              {getInitials(user.name, user.lastname)}
+            </AvatarFallback>
+          </Avatar>
           )}
           <p className="flex flex-col items-center mb-[0.5rem] mt-3">
             {user.name} {user.lastname}
@@ -207,11 +192,14 @@ export function UserDetail({ user, open, setIsOpen }: Props) {
             setIsOpen={setIsOpen}
             setIsPending={setIsPending}
             file={file}
+            setFile={setFile}
           />
         </div>
       </div>
       {edit ? (
-        <SheetFooter className="mt-8 md:mt-0 sm:justify-center gap-9 ">
+        <SheetFooter className="mt-8 md:mt-0 sm:justify-center">
+          <div className="flex justify-center"> {/* Cambiamos de md:justify-end a justify-center */}
+          <div className="flex gap-9">
           <Button
             onClick={(event) => {
               setEdit(!edit);
@@ -233,6 +221,8 @@ export function UserDetail({ user, open, setIsOpen }: Props) {
             )}
             {user.is_active ? "Eliminar" : "Activar"}
           </Button>
+          </div>
+        </div>
         </SheetFooter>
       ) : (
         <SheetFooter className="mt-8 md:mt-1 sm:justify-center gap-9">

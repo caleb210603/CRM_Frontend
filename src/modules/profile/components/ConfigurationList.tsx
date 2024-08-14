@@ -5,6 +5,8 @@ import { useState } from "react";
 import ConfigurePassword from "./ConfigurePassword";
 import { ConfigureName } from "./ConfigureName";
 
+
+
 export const ConfigurationList = () => {
   const [statusButton, setstatusButton] = useState("CL");
 
@@ -49,7 +51,7 @@ export const ConfigurationList = () => {
                   onSelect={() => {
                     setstatusButton(item.status);
                   }}
-                  className="flex justify-between"
+                  className="flex justify-between cursor-pointer"
                 >
                   <div className="flex gap-5 items-center hover:text-primary">
                     {icons(item.id)}
@@ -68,7 +70,7 @@ export const ConfigurationList = () => {
         </Command>
       )}
       {statusButton === "CC" && (
-        <ConfigurePassword setstatusButton={setstatusButton} />
+        <ConfigurePassword setstatusButton={setstatusButton}/>
       )}
       {statusButton === "CN" && (
         <ConfigureName setstatusButton={setstatusButton} />

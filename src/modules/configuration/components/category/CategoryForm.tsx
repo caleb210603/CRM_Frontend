@@ -18,15 +18,11 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { CategoriaSchema } from "@/lib/validators/categoria";
 import { useState } from "react";
 import { useTheme } from "@/contexts/theme";
-import api from "@/services/api";
 
 import { Badge } from "@/components/ui/badge";
 import { useQueryClient } from "react-query";
 import { categoryColors } from "@/lib/utils";
 import { useCategoriaCreate } from "../../hooks/useCategoriaCreate";
-
-
-import { ShoppingCart,HandPlatter } from 'lucide-react';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 
 interface Props {

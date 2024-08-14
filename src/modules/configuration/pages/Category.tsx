@@ -17,7 +17,7 @@ export function Categorias() {
   return (
     <div className="space-y-6 py-6">
       <div>
-        <h3 className="text-lg font-medium">Categorias</h3>
+        <h3 className="text-lg font-extrabold">Categorias</h3>
         <p className="text-sm text-muted-foreground">
           Organiza tu contenido: Explora tus categorías y encuentra lo que
           necesitas fácilmente.

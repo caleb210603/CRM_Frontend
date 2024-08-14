@@ -1,58 +1,46 @@
-import { ColumnDef } from "@tanstack/react-table";
-import { Checkbox } from "@/components/ui/checkbox";
-import { User as UserDetailType } from "@/types/auth";
+  import { ColumnDef } from "@tanstack/react-table";
+import { User, User as UserDetailType } from "@/types/auth";
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetTrigger } from "@/components/ui/sheet";
 import { UserDetail } from "../UserDetail";
 import { useState } from "react";
-import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 
 export const columns: ColumnDef<UserDetailType>[] = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        className="ml-4"
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
+
   {
     accessorKey: "image",
     header: ({ column }) => {
       return (
 
-         <div className="flex items-center justify-center">
-           <span className="mr-2 ml-2">Perfil</span>
+        <div className="flex items-center justify-center">
+          <span className="mr-2 ml-2">Perfil</span>
         </div>
       );
     },
     cell: ({ row }) => (
+      /*Si es que hay imagen se muestra la imagen*/
       <div className="flex items-center justify-center">
-      <Avatar className="w-14 h-14">
-        <AvatarImage
-          src={row.getValue("image")}
-          alt="Imagen de perfil"
-          className="object-cover rounded-full w-full h-full max-w-full max-h-full"
-          style={{objectFit: 'cover'}}
-        />
-      </Avatar>
+        {(row.getValue("image") as string)?.includes("/media/photos") ? (
+          <Avatar className="w-16 h-16">
+            <AvatarImage
+              src={row.getValue("image")}
+              alt="Imagen de perfil"
+              className="object-cover rounded-full w-full h-full max-w-full max-h-full"
+              style={{ objectFit: 'cover' }}
+            />
+          </Avatar>
+        ) : (
+          /*Si no hay imagen se muestra el avatar con las iniciales*/
+          <Avatar className="mx-auto  rounded-full w-16 h-16 flex-initial object-cover">
+            <AvatarFallback className="text-1xl flex items-center justify-center h-full">
+              {typeof row.getValue("name") === 'string' ? (row.getValue("name") as string)[0] : ''}
+              {typeof row.getValue("lastname") === 'string' && row.getValue("lastname") ? (row.getValue("lastname") as string)[0] : ''}
+            </AvatarFallback>
+          </Avatar>
+        )}
       </div>
     ),
   },
@@ -148,15 +136,21 @@ export const columns: ColumnDef<UserDetailType>[] = [
     enableHiding: false,
     cell: ({ row }) => {
       const user = row.original;
-      const [open, setIsOpen] = useState(false)
-      return (
-        <Sheet open={open} onOpenChange={setIsOpen}>
-          <SheetTrigger asChild>
-            <Button variant="outline">Ver</Button>
-          </SheetTrigger>
-          <UserDetail user={user} open={open} setIsOpen={setIsOpen}  />
-        </Sheet>
-      );
+      const [open, setIsOpen] = useState(false);
+      if (user.role_auth === 1) {
+        return (
+          <Sheet open={open} onOpenChange={setIsOpen}>
+            <SheetTrigger asChild>
+              <Button variant="outline">Ver</Button>
+            </SheetTrigger>
+            <UserDetail user={user} open={open} setIsOpen={setIsOpen} />
+          </Sheet>
+        );
+      } else {
+        return null; // No mostrar la columna de acciones si role_auth no es 1
+      }
     },
   },
 ];
+
+

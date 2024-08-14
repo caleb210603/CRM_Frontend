@@ -9,12 +9,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useQueryClient } from "react-query";
+import { useQuery, useQueryClient } from "react-query";
 import { z } from "zod";
 import Dropzone from "react-dropzone";
 import api from "@/services/api";
 import { toast } from "@/hooks/useToast";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Checkbox } from "@/components/ui/checkbox"
 
 import {
   Select,
@@ -32,6 +33,7 @@ import { MousePointerClick } from "lucide-react";
 import { useState } from "react";
 import { Service } from "@/types/service";
 import { ServiceSchema } from "@/lib/validators/service";
+import { getPromotions } from "@/services/fetch";
 
 interface Props {
   mode: "create" | "update";
@@ -44,17 +46,18 @@ export function ServiceForm({ mode, setIsPending, setIsOpen, service }: Props) {
   const [draggedImage, setDraggedImage] = useState<string | File>(service?.image || "")
   const { categories } = useSelector((state: RootState) => state.categories);
   const queryClient = useQueryClient();
+  const { data: promotions } = useQuery('promotions', getPromotions)
 
   const form = useForm<z.infer<typeof ServiceSchema>>({
     resolver: zodResolver(ServiceSchema),
     defaultValues: {
-        name: service?.name,
-        description: service?.description,
-        category:service?.category,
-        rate:service?.rate,
-        image:service?.image,
-        promotion:service?.promotion,
-        service_time: service?.service_time
+      name: service?.name,
+      description: service?.description,
+      category: service?.category,
+      maintenance: service?.maintenance,
+      rate: service?.rate,
+      promotion: service?.promotion,
+      service_time: service?.service_time
     },
   });
 
@@ -70,17 +73,28 @@ export function ServiceForm({ mode, setIsPending, setIsOpen, service }: Props) {
     setIsPending(true);
 
     const formData = new FormData();
-    formData.append('image', draggedImage)
+
+    if (typeof draggedImage !== 'string') {
+
+      formData.append('image', draggedImage)
+    }
+
+
+    /*  formData.append('maintenance',false); */
 
     Object.keys(values).forEach(key => {
       formData.append(key, values[key]);
+    });
+
+    formData.forEach((value, key) => {
+      console.log(key + ', ' + value);
     });
 
     if (mode === "create") {
       api.post("/services/create", formData)
         .then(response => {
           const { status } = response;
-          console.log({ res: status });
+
           if (status >= 400) {
             toast({
               description: "Error al crear Producto",
@@ -88,7 +102,7 @@ export function ServiceForm({ mode, setIsPending, setIsOpen, service }: Props) {
             });
           } else {
             toast({ description: "Producto creado correctamente" });
-            queryClient.invalidateQueries("products");
+            queryClient.invalidateQueries("services");
           }
         })
         .catch(error => {
@@ -108,7 +122,11 @@ export function ServiceForm({ mode, setIsPending, setIsOpen, service }: Props) {
           return
         });
     } else {
-      api.patch(`/products/update/${product?.id}`, formData)
+
+
+
+
+      api.patch(`/services/update/${service?.id}`, formData)
         .then(response => {
           const { status, data } = response;
           console.log(data);
@@ -119,12 +137,12 @@ export function ServiceForm({ mode, setIsPending, setIsOpen, service }: Props) {
             });
           } else {
             toast({ description: "Producto editado correctamente" });
-            queryClient.invalidateQueries("products");
+            queryClient.invalidateQueries("services");
           }
         })
         .catch(error => {
           console.error("Error en la solicitud:", error);
-          // Maneja el error de manera adecuada aquí, si es necesario
+
         });
     }
 
@@ -134,7 +152,7 @@ export function ServiceForm({ mode, setIsPending, setIsOpen, service }: Props) {
 
   const handleImageUpload = (file: File) => setDraggedImage(file)
 
-
+  const filteredCategories = categories.filter(category => category.type_category === 1);
 
   return (
     <div className="flex gap-4 ">
@@ -142,7 +160,7 @@ export function ServiceForm({ mode, setIsPending, setIsOpen, service }: Props) {
         <div className="w-1/2 flex h-[500px]">
           <Dropzone onDrop={(acceptedFiles) => handleImageUpload(acceptedFiles[0])}>
             {({ getRootProps, getInputProps }) => (
-              <section className="h-full w-[99%]">
+              <section className="h-full w-[99%] border-2 rounded-sm">
                 <div
                   {...getRootProps()}
                   className="group h-full relative transition-all duration-300 bg-background
@@ -159,11 +177,11 @@ export function ServiceForm({ mode, setIsPending, setIsOpen, service }: Props) {
                     </p>
                   </div>
                   <input {...getInputProps()} />
-                  <img
+                  {draggedImage != "" && <img
                     src={typeof draggedImage === 'string' ? draggedImage : URL.createObjectURL(draggedImage)}
                     alt={service?.name}
                     className="w-full h-full object-cover duration-700 ease-in-out"
-                  />
+                  />}
                 </div>
               </section>
             )}
@@ -224,7 +242,7 @@ export function ServiceForm({ mode, setIsPending, setIsOpen, service }: Props) {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {categories.map((category) => (
+                        {filteredCategories.map((category) => (
                           <SelectItem
                             key={category.id}
                             value={category.id.toString()}
@@ -250,9 +268,29 @@ export function ServiceForm({ mode, setIsPending, setIsOpen, service }: Props) {
                 render={({ field }) => (
                   <FormItem className="w-full">
                     <FormLabel>Promoción</FormLabel>
-                    <FormControl>
-                      <Input placeholder="select" {...field} onChange={(e) => field.onChange(Number(e.target.value))}/>
-                    </FormControl>
+                    <Select
+                      defaultValue={(field.value) ?field.value.toString():""}
+                      onValueChange={(value) => field.onChange(Number(value))}
+                    >
+                      <FormControl>
+                        <SelectTrigger
+                          className={`${!field.value && "text-muted-foreground"
+                            } hover:text-accent-foreground`}
+                        >
+                          <SelectValue placeholder="Seleccione un tipo" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {promotions?.map((promotion) => (
+                          <SelectItem
+                            key={promotion.id}
+                            value={promotion.id!.toString()}
+                          >
+                            {promotion.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -272,18 +310,37 @@ export function ServiceForm({ mode, setIsPending, setIsOpen, service }: Props) {
               />
               <FormField
                 control={form.control}
-                name="service_time"
+                name="maintenance"
                 render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>tiempo de servicio</FormLabel>
-                    <FormControl>
-                      <Input   placeholder="8:00:00" {...field} />
+                  <FormItem className="w-full  flex items-end gap-4">
+                    <FormLabel >Mantenimiento</FormLabel>
+                    <FormControl className="">
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              
+
+
+
+              <FormField
+                control={form.control}
+                name="service_time"
+                render={({ field }) => (
+                  <FormItem className="w-full">
+                    <FormLabel>tiempo de servicio</FormLabel>
+                    <FormControl>
+                      <Input placeholder="8:00:00" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
             </form>
           </Form>
         </ScrollArea>

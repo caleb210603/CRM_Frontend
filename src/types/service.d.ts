@@ -5,7 +5,7 @@ export type Service = {
   service_time: Date;
   maintenance?: boolean;
   rate: string;
-  image: string | File;
+  image: File | string;
   created_at?: Date; 
   updated_at?: Date; 
   promotion: number;

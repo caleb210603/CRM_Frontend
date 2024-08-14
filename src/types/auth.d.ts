@@ -1,3 +1,4 @@
+
 export interface User {
   id: number;
   username: string;
@@ -11,7 +12,9 @@ export interface User {
   role: number;
   is_active?: boolean;
   image: File | string;
+  role_auth: number
 }
+
 
 export interface UserDetail extends User {
   position_name: string;
@@ -25,16 +28,24 @@ export interface ClientData {
   results: ClientDetail[];
 }
 export interface ClientDetail {
-  clientID: number;
+  id: number;
   name: string;
   lastname: string;
-  documentType: number;
-  documentNumber: string;
+  document_type: number;
+  document_number: string;
+  birthdate : Date;
   email: string;
-  cellNumber: string;
+  gender: number;
+  phone: string;
   address: string;
+  postal_code: string;
+  province: string;
+  district: string;
+  country: string;
+  active?: boolean;
+  image: File | string;
   created_at: string;
-  state: boolean;
+  role_auth: number;
 }
 
 export interface CategoriaDetail {
@@ -45,4 +56,14 @@ export interface CategoriaDetail {
   color: number;
   description: string;
   type_category: number;
+}
+
+export interface PromotionDetail {
+  [x: string]: any;
+  id: number;
+  name: string;
+  description: string;
+  discount: number;
+  start_date: string;
+  ending_date: string;
 }

@@ -32,6 +32,8 @@ import { Badge } from "@/components/ui/badge";
 import { categoryColors } from "@/lib/utils";
 import { MousePointerClick } from "lucide-react";
 import { useState } from "react";
+import { statusProduct } from "../config";
+
 
 interface Props {
   mode: "create" | "update";
@@ -56,10 +58,8 @@ export function ProductForm({ mode, setIsPending, setIsOpen, product }: Props) {
       barcode: product?.barcode,
       status: product?.status,
       category: product?.category,
-      image: product?.image,
       brand: product?.brand,
       rating: product?.rating,
-
     },
   });
 
@@ -75,7 +75,11 @@ export function ProductForm({ mode, setIsPending, setIsOpen, product }: Props) {
     setIsPending(true);
 
     const formData = new FormData();
-    formData.append('image', draggedImage)
+
+    if (typeof draggedImage !== 'string') {
+
+      formData.append('image', draggedImage)
+    }
 
     Object.keys(values).forEach(key => {
       formData.append(key, values[key]);
@@ -92,6 +96,7 @@ export function ProductForm({ mode, setIsPending, setIsOpen, product }: Props) {
               variant: "destructive",
             });
           } else {
+            setIsOpen(false);
             toast({ description: "Producto creado correctamente" });
             queryClient.invalidateQueries("products");
           }
@@ -115,14 +120,15 @@ export function ProductForm({ mode, setIsPending, setIsOpen, product }: Props) {
     } else {
       api.patch(`/products/update/${product?.id}`, formData)
         .then(response => {
-          const { status, data } = response;
-          console.log(data);
+          const { status } = response;
+
           if (status >= 400) {
             toast({
               description: "Error al editar Producto",
               variant: "destructive",
             });
           } else {
+            setIsOpen(false);
             toast({ description: "Producto editado correctamente" });
             queryClient.invalidateQueries("products");
           }
@@ -133,30 +139,31 @@ export function ProductForm({ mode, setIsPending, setIsOpen, product }: Props) {
         });
     }
 
-    console.log("nunca entra aqui")
     setIsPending(false);
-    setIsOpen(false);
+
   };
 
   const handleImageUpload = (file: File) => setDraggedImage(file)
 
+  const filteredCategories = categories.filter(category => category.type_category === 0);
 
 
   return (
     <div className="flex gap-4 ">
       {(
         <div className="w-1/2 flex h-[500px]">
+
           <Dropzone onDrop={(acceptedFiles) => handleImageUpload(acceptedFiles[0])}>
             {({ getRootProps, getInputProps }) => (
-              <section className="h-full w-[99%]">
+              <section className="h-full w-[99%] border-2 rounded-sm">
                 <div
                   {...getRootProps()}
                   className="group h-full relative transition-all duration-300 bg-background
-                  rounded-sm text-center flex justify-center items-center overflow-hidden"
+        rounded-sm text-center flex justify-center items-center overflow-hidden"
                 >
                   <div
                     className="absolute top-0 left-0 flex flex-col items-center justify-center gap-4 w-full h-full
-                  bg-foreground/30 dark:bg-background/30 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity"
+        bg-foreground/30 dark:bg-background/30 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity"
                   >
                     <MousePointerClick className="h-20 w-20 text-white/50" />
                     <p className="text-white/50 px-20">
@@ -165,15 +172,18 @@ export function ProductForm({ mode, setIsPending, setIsOpen, product }: Props) {
                     </p>
                   </div>
                   <input {...getInputProps()} />
-                  <img
-                    src={typeof draggedImage === 'string' ? draggedImage : URL.createObjectURL(draggedImage)}
+                  {draggedImage != "" && <img
+                    src={typeof draggedImage === 'string'
+                      ? draggedImage
+                      : URL.createObjectURL(draggedImage)}
                     alt={product?.name}
-                    className="w-full h-full object-cover duration-700 ease-in-out"
-                  />
+                    className="w-full h-full object-cover max-w-[400px] max-h-[330px] duration-700 ease-in-out"
+                  />}
                 </div>
               </section>
             )}
           </Dropzone>
+
         </div>
       )}
 
@@ -205,85 +215,57 @@ export function ProductForm({ mode, setIsPending, setIsOpen, product }: Props) {
                   <FormItem className="w-full">
                     <FormLabel>Descripción</FormLabel>
                     <FormControl>
-                      <Input placeholder="Descripción" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="price"
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>Precio</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        inputMode="numeric"
-                        placeholder="Precio"
-                        {...field}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                      <Input placeholder="Descripción" {...field}
+                        className="w-full" />
 
-              <FormField
-                control={form.control}
-                name="stock"
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>Cantidad</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        inputMode="numeric"
-                        placeholder="Cantidad"
-                        {...field}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
-                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+              <div className="w-full flex flex-col md:flex-row items-start md:items-center space-y-4 md:space-y-0 md:space-x-8">
+                <FormField
+                  control={form.control}
+                  name="price"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel>Precio</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          inputMode="decimal"
+                          placeholder="Precio"
+                          {...field}
+                          onChange={(e) => {
+                            const value = parseFloat(e.target.value);
+                            if (!isNaN(value) && value >= 1 && value <= Number.MAX_SAFE_INTEGER) {
+                              field.onChange(value);
+                            } else {
+                              field.onChange('');
+                            }
+                          }}
+                          className="number-to-text"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="barcode"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel>Barcode</FormLabel>
+                      <FormControl>
+                        <Input type="text" placeholder="Barcode" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
-              <FormField
-                control={form.control}
-                name="stock_security"
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>Cantidad de seguridad</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        inputMode="numeric"
-                        placeholder="Cantidad de seguridad"
-                        {...field}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="barcode"
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>barcode</FormLabel>
-                    <FormControl>
-                      <Input type="text" placeholder="barcode" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
 
               <FormField
                 control={form.control}
@@ -303,7 +285,7 @@ export function ProductForm({ mode, setIsPending, setIsOpen, product }: Props) {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {categories.map((category) => (
+                        {filteredCategories.map((category) => (
                           <SelectItem
                             key={category.id}
                             value={category.id.toString()}
@@ -323,32 +305,50 @@ export function ProductForm({ mode, setIsPending, setIsOpen, product }: Props) {
               />
 
 
-              <FormField
-                control={form.control}
-                name="rating"
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>Rating</FormLabel>
-                    <FormControl>
-                      <Input placeholder="5.2" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="stock"
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>Stock</FormLabel>
-                    <FormControl>
-                      <Input placeholder="cantidad de productos" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="w-full flex flex-col md:flex-row items-start md:items-center space-y-4 md:space-y-0 md:space-x-8">
+                <FormField
+                  control={form.control}
+                  name="rating"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel>Rating</FormLabel>
+                      <FormControl>
+                        <Input placeholder="5.2" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="stock"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel>Stock</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          inputMode="numeric"
+                          {...field}
+                          onChange={(e) => {
+                            const value = parseInt(e.target.value, 10);
+                            if (!isNaN(value) && value >= 1) {
+                              field.onChange(value);
+                            } else {
+                              field.onChange('');
+                            }
+                          }}
+                          placeholder="Cantidad de productos"
+                          className="number-to-text"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+
               <FormField
                 control={form.control}
                 name="stock_security"
@@ -356,26 +356,60 @@ export function ProductForm({ mode, setIsPending, setIsOpen, product }: Props) {
                   <FormItem className="w-full">
                     <FormLabel>Stock security</FormLabel>
                     <FormControl>
-                      <Input placeholder="cantidad de productos seguros" {...field} />
+
+                      <Input
+                        type="number"
+                        inputMode="numeric"
+                        {...field}
+                        onChange={(e) => {
+                          const value = parseInt(e.target.value, 10);
+                          if (!isNaN(value) && value >= 1) {
+                            field.onChange(value); // Actualiza el valor del campo con el valor numérico
+                          } else {
+                            field.onChange(''); // Permite borrar completamente el input
+                          }
+                        }}
+                        placeholder="Cantidad de productos"
+                        className="number-to-text"
+                      />
+
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
+
               <FormField
                 control={form.control}
                 name="status"
                 render={({ field }) => (
                   <FormItem className="w-full">
                     <FormLabel>Estado</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        inputMode="numeric"
-                        {...field}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
-                        placeholder="estado en el que se encuentra" />
-                    </FormControl>
+                    <Select
+                      defaultValue={(field.value != undefined) ? field.value.toString() : ""}
+                      onValueChange={(value) => field.onChange(Number(value))}
+                    >
+                      <FormControl>
+                        <SelectTrigger
+                          className={`${!field.value && "text-muted-foreground"
+                            } hover:text-accent-foreground`}
+                        >
+                          <SelectValue placeholder="Seleccione un tipo" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {statusProduct.map((values) => (
+                          <SelectItem
+                            key={values.id}
+                            value={values.id.toString()}
+                          >
+                            {values.name}
+                          </SelectItem>
+
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -396,6 +430,7 @@ export function ProductForm({ mode, setIsPending, setIsOpen, product }: Props) {
               />
 
             </form>
+
           </Form>
         </ScrollArea>
       </div>

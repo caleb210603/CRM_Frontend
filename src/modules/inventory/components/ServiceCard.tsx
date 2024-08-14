@@ -28,8 +28,6 @@ export function ServiceCard({
     setLoading,
     imageClasses,
 }: ProductCardProps) {
-
-    console.log(service)
     return (
         <Card className={cn("rounded-xl overflow-hidden", className)}>
             <CardHeader

@@ -24,16 +24,15 @@ export function CategoriaActions() {
       </DialogTrigger>
       <DialogContent className="gap-8">
         <DialogHeader>
-          <DialogTitle>Nuevo Categoria</DialogTitle>
+          <DialogTitle>Nueva Categoria</DialogTitle>
           <DialogDescription>
-            En este formulario puedes crear un nuevo categoria
+            En este formulario puedes crear una nueva categoria
           </DialogDescription>
         </DialogHeader>
         <CategoriaForm
           setIsPending={setIsPending}
           setIsOpen={setIsOpen}
         />
-
         <DialogFooter className="flex sm:justify-between gap-4">
           <DialogClose asChild>
             <Button className="w-full" variant="outline">
@@ -53,7 +52,7 @@ export function CategoriaActions() {
               />
             )}
             Agregar
-            <span className="sr-only">Agregar nuevo categoria</span>
+            <span className="sr-only">Agregar nueva categoria</span>
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -12,14 +12,18 @@ import { Button } from "@/components/ui/button";
 import { UserForm } from "./UserForm";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
 
 export function UserActions() {
   const [isPending, setIsPending] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-
+  const { user } = useAuth();
+  
+  
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
+      <DialogTrigger asChild> 
+        {/* Agregar usuario  */}
         <Button>Crear usuario</Button>
       </DialogTrigger>
       <DialogContent className="gap-8">

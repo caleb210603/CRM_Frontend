@@ -1,4 +1,3 @@
-import { ClientSchema } from "@/lib/validators/client";
 import {
   Form,
   FormControl,
@@ -9,7 +8,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { z } from "zod";
 import { ClientDetail as client } from "@/types/auth";
 import {
   Select,
@@ -18,51 +16,58 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { toast } from "@/hooks/useToast";
-import api from "@/services/api";
+
 import { useQueryClient } from "react-query";
-import { useEditClient } from "../hooks/useEditCient";
+
+import { updateClient } from "../services/clientService";
+import { getDocumentType } from "@/enums/documentType";
+import { getGender } from "@/enums/gender";
 
 interface Props {
   edit: boolean;
   client: client | null;
   setIsPending: (value: boolean) => void;
   form: any;
+  file: File | null;
+  setFile: (file: File | null) => void;
 }
 
-function CLientDataEditable({ edit, client, setIsPending, form }: Props) {
+function CLientDataEditable({ edit, client, setIsPending, form, file, setFile }: Props) {
   const queryClient = useQueryClient();
-  const type = client?.documentType;
-  const getDocumentType =
-    type == 0
-      ? "DNI"
-      : type == 1
-      ? "Cedula"
-      : type == 2
-      ? "Pasaporte"
-      : type == 3
-      ? "Otros"
-      : "";
+  const getDocumentTypeValue = getDocumentType(client?.document_type);
+  const getGenderValue = getGender(client?.gender);
 
-  const { editClient } = useEditClient();
-  const { mutate, isLoading } = editClient(client?.clientID, {
-    name: form.getValues("name"),
-    lastname: form.getValues("lastname"),
-    documentType: form.getValues("documentType"),
-    documentNumber: form.getValues("documentNumber"),
-    address: form.getValues("address"),
-    cellNumber: form.getValues("cellNumber"),
-    email: form.getValues("email"),
-    state: form.getValues("state"),
-  });
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsPending(true);
     try {
-      await mutate();
+      const formData = new FormData(); 
+  
+      if (file) {
+        formData.append("image", file);
+      }
+      formData.append("name", form.getValues("name"));
+      formData.append("lastname", form.getValues("lastname"));
+      formData.append("document_type", form.getValues("document_type"));
+      formData.append("document_number", form.getValues("document_number"));
+      formData.append("birthdate", form.getValues("birthdate"));
+      formData.append("email", form.getValues("email"));
+      formData.append("gender", form.getValues("gender"));
+      formData.append("phone", form.getValues("phone"));
+      formData.append("address", form.getValues("address"));
+      formData.append("postal_code", form.getValues("postal_code"));
+      formData.append("province", form.getValues("province"));
+      formData.append("district", form.getValues("district"));
+      formData.append("country", form.getValues("country"));
+  
+      if (client) {
+        await updateClient(client.id, formData);
+        setFile(null);
+      }
     } finally {
       setIsPending(false);
+      queryClient.invalidateQueries("clients");
     }
   };
 
@@ -102,6 +107,51 @@ function CLientDataEditable({ edit, client, setIsPending, form }: Props) {
             />
           </div>
           <FormField
+              control={form.control}
+              name="birthdate"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormLabel>Fecha de nacimiento</FormLabel>
+                  <FormControl>
+                    <Input {...field} disabled={edit} />
+                  </FormControl>
+                  <FormMessage>
+                    El formato de la fecha de nacimiento debe ser "yyyy-mm-dd"
+                  </FormMessage>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="gender"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormLabel>Sexo</FormLabel>
+                  <Select
+                    onValueChange={(value) => field.onChange(Number(value))}
+                    value={String(field.value) || "default"}
+                    disabled={edit}
+                  >
+                    <FormControl>
+                      <SelectTrigger
+                        className={`${
+                          !field.value && "text-muted-foreground"
+                        } hover:text-accent-foreground`}
+                      >
+                        <SelectValue placeholder={getGenderValue} />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="0">Mujer</SelectItem>
+                      <SelectItem value="1">Hombre</SelectItem>
+                      <SelectItem value="2">Prefiero no decirlo</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          <FormField
             name="email"
             render={({ field }) => (
               <FormItem className="w-full">
@@ -116,7 +166,7 @@ function CLientDataEditable({ edit, client, setIsPending, form }: Props) {
           <div className="flex justify-between gap-4">
             <FormField
               control={form.control}
-              name="documentType"
+              name="document_type"
               render={({ field }) => (
                 <FormItem className="w-full">
                   <FormLabel>Tipo de documento</FormLabel>
@@ -130,7 +180,7 @@ function CLientDataEditable({ edit, client, setIsPending, form }: Props) {
                           !field.value && "text-muted-foreground"
                         } hover:text-accent-foreground`}
                       >
-                        <SelectValue placeholder={getDocumentType} />
+                        <SelectValue placeholder={getDocumentTypeValue} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -145,10 +195,64 @@ function CLientDataEditable({ edit, client, setIsPending, form }: Props) {
               )}
             />
             <FormField
-              name="documentNumber"
+              name="document_number"
               render={({ field }) => (
                 <FormItem className="w-full">
                   <FormLabel>Nº identificación</FormLabel>
+                  <FormControl>
+                    <Input {...field} disabled={edit} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <div className="flex justify-between gap-4">
+            <FormField
+              control={form.control}
+              name="country"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormLabel>País</FormLabel>
+                  <FormControl>
+                    <Input {...field} disabled={edit} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              name="province"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormLabel>Provincia/Región</FormLabel>
+                  <FormControl>
+                    <Input {...field} disabled={edit} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <div className="flex justify-between gap-4">
+            <FormField
+              control={form.control}
+              name="district"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormLabel>Distrito</FormLabel>
+                  <FormControl>
+                    <Input {...field} disabled={edit} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              name="postal_code"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormLabel>Código postal</FormLabel>
                   <FormControl>
                     <Input {...field} disabled={edit} />
                   </FormControl>
@@ -173,7 +277,7 @@ function CLientDataEditable({ edit, client, setIsPending, form }: Props) {
           <div className="flex justify-between gap-4">
             <FormField
               control={form.control}
-              name="cellNumber"
+              name="phone"
               render={({ field }) => (
                 <FormItem className="w-full">
                   <FormLabel>Teléfono</FormLabel>
