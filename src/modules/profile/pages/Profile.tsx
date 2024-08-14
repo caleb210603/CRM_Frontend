@@ -126,7 +126,7 @@ export const Profile = ({ open, setIsOpen }: Props) => {
     } catch (error) {
       console.error("Error al actualizar cuenta:", error);
     } finally {
-      window.location.reload();
+     window.location.reload();
     }
   };
 

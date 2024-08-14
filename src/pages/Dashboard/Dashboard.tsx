@@ -9,12 +9,17 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DatePickerWithRange } from "@/components/ui/date-range-picker";
 import { Overview } from "@/components/Overview";
-import { RecentSales } from "@/modules/analytics/components/RecentSales";
+import { RecentSales } from "@/pages/Dashboard/modules/Overview/components/RecentSales";
 import { useTitle } from "@/hooks/useTitle";
-import { SoldProducts } from "@/modules/analytics/components/SoldProducts";
+import { SoldProducts } from "@/pages/Dashboard/modules/Overview/components/SoldProducts";
 import { useState } from "react";
-import { SoldServices } from "@/modules/analytics/components/SoldServices";
-import { useSales } from "@/modules/analytics/hooks/useSales";
+import { SoldServices } from "@/pages/Dashboard/modules/Overview/components/SoldServices";
+import { useSales } from "@/pages/Dashboard/modules/Overview/hooks/useSales";
+import Notifications from "./modules/Notifications/Notifications";
+import { useQuery } from "react-query";
+import { User } from "@/types/auth";
+import api from "@/services/api";
+import Analytics from "./modules/Analytics/Analytics";
 
 export default function DashboardPage() {
   useTitle("Panel de control");
@@ -22,6 +27,21 @@ export default function DashboardPage() {
   const { isLoading, sales, totalSales } = useSales();
 
   const [isActive, setisActive] = useState<boolean>(true);
+
+  // Función para obtener el perfil del usuario autenticado (usando la misma interfaz User)
+  const getUser = async (): Promise<User> => {
+    const { data } = await api.get<User>("/auth/profile");
+    return data;
+  };
+
+  useTitle("Panel de control");
+
+  const { data: userAuth } = useQuery<User>("user", getUser);
+
+  const isAdmin = () => {
+    return userAuth?.role == 1;
+  };
+
   return (
     <div className="flex flex-col mb-5">
       <div className="flex-1 space-y-4">
@@ -37,15 +57,13 @@ export default function DashboardPage() {
         <Tabs defaultValue="overview" className="space-y-4">
           <TabsList>
             <TabsTrigger value="overview">Resumen</TabsTrigger>
-            <TabsTrigger value="analytics" disabled>
-              Analítica
-            </TabsTrigger>
+            <TabsTrigger value="analytics">Analítica</TabsTrigger>
             <TabsTrigger value="reports" disabled>
               Informes
             </TabsTrigger>
-            <TabsTrigger value="notifications" disabled>
-              Notificaciones
-            </TabsTrigger>
+            {isAdmin() && (
+              <TabsTrigger value="notifications">Notificaciones</TabsTrigger>
+            )}
           </TabsList>
           <TabsContent value="overview" className="space-y-4 items-center">
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 w-full">
@@ -144,6 +162,7 @@ export default function DashboardPage() {
                   <RecentSales />
                 </CardContent>
               </Card>
+
             </div> */}
             <Card className="rounded-lg shadow-lg p-4 transform transition-transform hover:scale-[1.01]">
               <CardHeader>
@@ -157,6 +176,12 @@ export default function DashboardPage() {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+          <TabsContent value="notifications">
+            <Notifications />
+          </TabsContent>
+          <TabsContent value="analytics">
+            <Analytics />
           </TabsContent>
         </Tabs>
       </div>

@@ -112,6 +112,7 @@ export const ProviderForm = ({ setIsOpen }: Props) => {
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="person_contact"
@@ -125,6 +126,7 @@ export const ProviderForm = ({ setIsOpen }: Props) => {
                 </FormItem>
               )}
             />
+            
             <FormField
               control={form.control}
               name="phone"

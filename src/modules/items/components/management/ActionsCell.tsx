@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetTrigger } from "@/components/ui/sheet";
 import { useState } from "react";
 import { ItemDetail } from "../ItemDetail";
-import { Item as ItemType } from "@/types/purchase";
+import { PurchaseDetail as ItemType } from "@/types/purchase";
 
 interface ExtendedItem extends ItemType {
   role_auth: number;

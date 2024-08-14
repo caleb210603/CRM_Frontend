@@ -45,7 +45,7 @@ export default function Expenses() {
         <TabsTrigger value="payments" onClick={() => handleTabClick('payments')}>Pagos</TabsTrigger>
       </TabsList>
       <Routes>
-        <Route path="/purchases" element={
+        <Route path="/purchases" element={ 
           <TabsContent value="purchases">
             <Purchases />
           </TabsContent>

@@ -6,6 +6,8 @@ import { store } from "@/store";
 import { ThemeProvider } from "@/contexts/theme";
 import { ReactQueryDevtools } from "react-query/devtools";
 import { FontProvider } from "@/contexts/font";
+import NotificationProvider from "@/contexts/notification";
+
 const queryClient = new QueryClient();
 
 interface Props {
@@ -19,7 +21,9 @@ export function Providers({ children }: Props) {
         <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
           <FontProvider defaultFont="lato" storageKey="vite-ui-font">
             <QueryClientProvider client={queryClient}>
-              {children}
+              <NotificationProvider>
+                {children}
+              </NotificationProvider>
               <ReactQueryDevtools position={"bottom-right"} />
             </QueryClientProvider>
           </FontProvider>

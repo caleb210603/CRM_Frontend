@@ -15,7 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Item } from "@/types/purchase";
+import { PurchaseDetail as Item } from "@/types/purchase";
 import {
   ColumnFiltersState,
   SortingState,

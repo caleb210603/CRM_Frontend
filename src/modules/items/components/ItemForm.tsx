@@ -7,7 +7,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { ItemSchema } from "@/lib/validators/item";
+import { PurchaseDetailSchema as ItemSchema } from "@/lib/validators/purchase";
 import api from "@/services/api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ChangeEvent, useEffect, useState } from "react";
@@ -55,7 +55,7 @@ export const ItemForm = ({ setIsOpen }: Props) => {
         description: data.description,
         quantity: data.quantity,
         price: data.price,
-        purchase_id: 1,
+
         date_purchase: date_purchase,
       });
       console.log(response);
