@@ -8,7 +8,7 @@ interface Props {
 
 function AuthLayout({ children }: Props) {
   return (
-    <div className="relative w-screen h-screen bg-muted">
+    <div className="relative w-screen h-screen bg-muted overflow-hidden">
       {children}
       <TailwindIndicator />
       <div
